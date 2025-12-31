@@ -205,9 +205,6 @@ int find_element_index(unsigned char arr[ROWS][COLS], enum enc_t encoding, unsig
 void converting_to_utf8(FILE *input, enum enc_t encoding, FILE *output) {
     int file_len = 0;
     while (getc(input) != EOF) {
-        // getc(input);
-        // char ch = getc(input);
-        // printf("%c", ch);
         file_len++;
     }
     printf("\nДлина файла: %d\n", file_len);
