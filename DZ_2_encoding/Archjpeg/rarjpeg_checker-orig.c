@@ -14,6 +14,7 @@ gcc -Wall -Wextra -Wpedantic -std=c11 -o rarjpeg_checker rarjpeg_checker.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #define ZIP_HEADER "PK\x03\x04"
 #define RARJPEG_MAGIC_SIZE 4  // Размер магического числа для Rarjpeg
