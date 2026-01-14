@@ -1,0 +1,41 @@
+#***************************************************************************
+#                                  _   _ ____  _
+#  Project                     ___| | | |  _ \| |
+#                             / __| | | | |_) | |
+#                            | (__| |_| |  _ <| |___
+#                             \___|\___/|_| \_\_____|
+#
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
+#
+# This software is licensed as described in the file COPYING, which
+# you should have received as part of this distribution. The terms
+# are also available at https://curl.se/docs/copyright.html.
+#
+# You may opt to use, copy, modify, merge, publish, distribute and/or sell
+# copies of the Software, and permit persons to whom the Software is
+# furnished to do so, under the terms of the COPYING file.
+#
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# KIND, either express or implied.
+#
+# SPDX-License-Identifier: curl
+#
+###########################################################################
+
+prefix=/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+supported_protocols="HTTP HTTPS TELNET"
+supported_features="alt-svc AsynchDNS HSTS HTTPSRR IPv6 Largefile PSL SSL threadsafe"
+
+Name: libcurl
+URL: https://curl.se/
+Description: Library to transfer files with HTTP, FTP, etc.
+Version: 8.18.0
+Requires: 
+Requires.private: openssl,libpsl
+Libs: -L${libdir} -lcurl 
+Libs.private:  -lpsl -lssl -lcrypto
+Cflags: -I${includedir} 
+Cflags.private: -DCURL_STATICLIB
