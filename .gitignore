@@ -2,3 +2,11 @@
 */Makefile
 *.[oa]
 *~
+DZ_2_encoding/template
+DZ_2_encoding/Archjpeg/zipjpeg_checker
+DZ_6_libs/weather_cjson
+DZ_6_libs/weather_ccan.c
+DZ_6_libs/call_curl copy.c
+DZ_6_libs/call_curl.c
+DZ_6_libs/test.c
+DZ_6_libs/weather_json-c.c
