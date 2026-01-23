@@ -94,22 +94,15 @@ echo > $TRACE/trace                            # Очистить буфер т�
 echo function > $TRACE/current_tracer          # Использовать функциональный трассировщик (наиболее надёжный)
 echo '__x64_sys_*' > ${TRACE}/set_ftrace_filter  # Фильтровать только системные вызовы
 
-
-# PID=$(ps -aux | grep ${PROG} | grep -v grep | grep -v "/bin/bash" | sed 's/[^0-9]*//' | cut -c1- | cut -d' ' -f1)
-# echo -e "PID = ${PID}"
-# echo -e "${PWD}"
-# echo "$PID" > ${TRACE}/set_ftrace_pid
-# echo "${TRACE}/set_ftrace_pid содержит PID: $(cat ${TRACE}/set_ftrace_pid)"
 echo 1 > ${TRACE}/tracing_on
 cd -
 ./${PROG}
 
 echo 0 > ${TRACE}/tracing_on                     # Остановить трассировку
 cat ${TRACE}/trace > /tmp/ftrace_output.txt      # Сохранить результаты
-# echo > ${TRACE}/set_ftrace_pid                   # Очистить фильтр по PID
 echo -e
 echo -e "Вывод данных трассировки из /tmp/ftrace_output.txt\n"
 head -n 12 /tmp/ftrace_output.txt
 cat /tmp/ftrace_output.txt | grep ${PROG}
-# rm -f /tmp/ftrace_output.txt
+rm -f /tmp/ftrace_output.txt
 echo -e
