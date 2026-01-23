@@ -10,3 +10,4 @@ DZ_6_libs/call_curl copy.c
 DZ_6_libs/call_curl.c
 DZ_6_libs/test.c
 DZ_6_libs/weather_json-c.c
+DZ_26_tooling_for_linux_kernel/tracing
