@@ -10,5 +10,6 @@ make
 make install
 ```
 ```
+cd ../bin/
 ./curl --version
 ```
