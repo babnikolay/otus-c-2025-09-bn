@@ -9,3 +9,6 @@
 make
 make install
 ```
+```
+./curl --version
+```
