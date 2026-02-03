@@ -1,9 +1,8 @@
 .vscode/
 *.[oa]
-*/*.[oa]
 *~
-*/*.log
-*/*.tar.gz
+*.log
+*.tar.gz
 DZ_2_encoding/template/
 DZ_2_encoding/Archjpeg/zipjpeg_checker
 DZ_2_encoding/Converter/converter
