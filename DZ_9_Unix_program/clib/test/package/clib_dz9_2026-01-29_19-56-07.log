@@ -1,0 +1,229 @@
+==18869== Memcheck, a memory error detector
+==18869== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==18869== Using Valgrind-3.22.0 and LibVEX; rerun with -h for copyright info
+==18869== Command: ./package-install-dependencies
+==18869== Parent PID: 18843
+==18869== 
+==18869== 
+==18869== HEAP SUMMARY:
+==18869==     in use at exit: 7,173,840 bytes in 45,120 blocks
+==18869==   total heap usage: 339,601 allocs, 294,481 frees, 77,969,246 bytes allocated
+==18869== 
+==18869== 7 bytes in 1 blocks are definitely lost in loss record 5 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C0B7: main (package-install-dependencies.c:24)
+==18869== 
+==18869== 7 bytes in 1 blocks are definitely lost in loss record 6 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C2CB: main (package-install-dependencies.c:34)
+==18869== 
+==18869== 7 bytes in 1 blocks are definitely lost in loss record 7 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C47C: main (package-install-dependencies.c:43)
+==18869== 
+==18869== 7 bytes in 1 blocks are definitely lost in loss record 8 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C690: main (package-install-dependencies.c:53)
+==18869== 
+==18869== 7 bytes in 1 blocks are definitely lost in loss record 9 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11CD5A: main (package-install-dependencies.c:85)
+==18869== 
+==18869== 22 bytes in 2 blocks are definitely lost in loss record 18 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C2CB: main (package-install-dependencies.c:34)
+==18869== 
+==18869== 22 bytes in 2 blocks are definitely lost in loss record 19 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x142374: strdup (strdup.c:24)
+==18869==    by 0x120C22: clib_package_install (clib-package.c:1383)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C47C: main (package-install-dependencies.c:43)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 58 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11C038: main (package-install-dependencies.c:22)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 59 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C0B7: main (package-install-dependencies.c:24)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 60 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11C24C: main (package-install-dependencies.c:32)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 61 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C2CB: main (package-install-dependencies.c:34)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 62 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11C3FD: main (package-install-dependencies.c:41)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 63 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C47C: main (package-install-dependencies.c:43)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 64 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11C611: main (package-install-dependencies.c:51)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 65 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C690: main (package-install-dependencies.c:53)
+==18869== 
+==18869== 94 (64 direct, 30 indirect) bytes in 2 blocks are definitely lost in loss record 66 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11CD5A: main (package-install-dependencies.c:85)
+==18869== 
+==18869== 128 bytes in 32 blocks are definitely lost in loss record 72 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x11F866: fetch_package_file_thread (clib-package.c:999)
+==18869==    by 0x49B8AA3: start_thread (pthread_create.c:447)
+==18869==    by 0x4A45A63: clone (clone.S:100)
+==18869== 
+==18869== 188 (128 direct, 60 indirect) bytes in 4 blocks are definitely lost in loss record 77 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C0B7: main (package-install-dependencies.c:24)
+==18869== 
+==18869== 188 (128 direct, 60 indirect) bytes in 4 blocks are definitely lost in loss record 78 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C2CB: main (package-install-dependencies.c:34)
+==18869== 
+==18869== 188 (128 direct, 60 indirect) bytes in 4 blocks are definitely lost in loss record 79 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C47C: main (package-install-dependencies.c:43)
+==18869== 
+==18869== 282 (192 direct, 90 indirect) bytes in 6 blocks are definitely lost in loss record 83 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x1215AD: clib_package_install (clib-package.c:1579)
+==18869==    by 0x11D948: install_packages (clib-package.c:374)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11C690: main (package-install-dependencies.c:53)
+==18869== 
+==18869== 376 (256 direct, 120 indirect) bytes in 8 blocks are definitely lost in loss record 90 of 146
+==18869==    at 0x4846828: malloc (in /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so)
+==18869==    by 0x13B87C: http_get_shared (http-get.c:46)
+==18869==    by 0x11E8F1: clib_package_new_from_slug_with_package_name (clib-package.c:660)
+==18869==    by 0x11EFB2: clib_package_new_from_slug (clib-package.c:796)
+==18869==    by 0x11D927: install_packages (clib-package.c:370)
+==18869==    by 0x1216DD: clib_package_install_dependencies (clib-package.c:1615)
+==18869==    by 0x11CD5A: main (package-install-dependencies.c:85)
+==18869== 
+==18869== LEAK SUMMARY:
+==18869==    definitely lost: 1,615 bytes in 85 blocks
+==18869==    indirectly lost: 660 bytes in 44 blocks
+==18869==      possibly lost: 0 bytes in 0 blocks
+==18869==    still reachable: 7,171,565 bytes in 44,991 blocks
+==18869==         suppressed: 0 bytes in 0 blocks
+==18869== Reachable blocks (those to which a pointer was found) are not shown.
+==18869== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==18869== 
+==18869== For lists of detected and suppressed errors, rerun with: -s
+==18869== ERROR SUMMARY: 22 errors from 22 contexts (suppressed: 0 from 0)

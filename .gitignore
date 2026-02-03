@@ -1,13 +1,20 @@
 .vscode/
-*/Makefile
 *.[oa]
+*/*.[oa]
 *~
-DZ_2_encoding/template
+*/*.log
+*/*.tar.gz
+DZ_2_encoding/template/
 DZ_2_encoding/Archjpeg/zipjpeg_checker
+DZ_2_encoding/Converter/converter
 DZ_6_libs/weather_cjson
-DZ_6_libs/weather_ccan.c
-DZ_6_libs/call_curl copy.c
-DZ_6_libs/call_curl.c
-DZ_6_libs/test.c
-DZ_6_libs/weather_json-c.c
+DZ_7_assembler/main
+DZ_7_assembler/asm_prog
+DZ_7_assembler/*.txt
+DZ_8_Unix_history/*.tar.gz
+DZ_9_Unix_program/*.zip
 DZ_26_tooling_for_linux_kernel/tracing
+DZ_27_drivers_system/lesson_test
+DZ_27_drivers_system/example
+DZ_27_drivers_system/simple_ring_buffer
+DZ_27_drivers_system/ring_buffer
