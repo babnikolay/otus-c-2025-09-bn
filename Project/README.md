@@ -157,6 +157,8 @@ ffmpeg -framerate 30 -i frames/frame_%05d.ppm -c:v libx264 -pix_fmt yuv420p outp
 ### 5. mandel_sdl.c
 Интерактивный Мандельброт, управляемый стрелками и + и - для увеличения/уменьшения изображения.
 ```
+sudo apt-get install libsdl2-2.0-0 libsdl2-dev -y
+sudo apt-get install libsdl2-image-dev libsdl2-image-2.0-0 -y
 gcc -O3 mandel_sdl.c -o mandel_sdl -Wall -Wextra -Wpedantic -lSDL2 -lm -fopenmp
 ```
 Запуск программы без параметров покажет список и описания параметров:
