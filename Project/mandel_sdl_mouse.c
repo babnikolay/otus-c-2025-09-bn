@@ -1,8 +1,4 @@
 /*
-
-*/
-
-/*
 Для реализации интерактива используем библиотеку SDL2.
 Это позволит нам перемещаться по фракталу стрелками и масштабировать его клавишами + и - в реальном времени.
 */
@@ -15,6 +11,10 @@
 void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels,
             double zoom, double cx, double cy, int iter_count, int W, int H)
 {
+    // Логарифмические константы - используется для оптимизации log(log(sqrt(z)))
+    const double inv_log2 = 1.0 / log(2.0);
+    const double log_05 = log(0.5);
+
 #pragma omp parallel for schedule(dynamic)
     for (int y = 0; y < H; y++)
     {
@@ -43,7 +43,10 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels,
             else
             {
                 // Плавная раскраска (упрощенная)
-                double mu = iter + 1 - log(log(sqrt(a2 + b2))) / log(2.0);
+                double r2 = a * a + b * b; // Квадрат модуля
+                // Вместо log(log(sqrt(r2))) / log(2)
+                double mu = iter + 1 - ((log_05 + log(log(r2))) * inv_log2);
+
                 uint8_t r = (uint8_t)(sin(0.1 * mu + 0.0) * 127 + 128);
                 uint8_t g = (uint8_t)(sin(0.1 * mu + 2.0) * 127 + 128);
                 uint8_t bl = (uint8_t)(sin(0.1 * mu + 4.0) * 127 + 128);
