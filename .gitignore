@@ -1,8 +1,31 @@
+# Global
 .vscode/
 *.[oa]
 *~
 *.log
 *.tar.gz
+
+# Executable
+*.bin
+*.o
+*.obj
+*.so
+*.out
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Projects
 DZ_2_encoding/template/
 DZ_2_encoding/Archjpeg/zipjpeg_checker
 DZ_2_encoding/Converter/converter
