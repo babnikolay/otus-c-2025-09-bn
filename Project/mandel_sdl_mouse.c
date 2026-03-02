@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <omp.h>
 #include <stdio.h>
+#include <time.h>
 
 // Обновленная функция рендера теперь принимает iter_count извне
 void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels,
@@ -62,6 +63,11 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels,
 
 int main(int argc, char **argv)
 {
+    // 1. Фиксируем время начала
+    time_t start_time = time(NULL);
+    printf("Начало: %s\n", ctime(&start_time));
+    fflush(stdout);
+
     if (argc != 3)
     {
         fprintf(stderr, "usage: %s width height\n", argv[0]);
@@ -142,8 +148,8 @@ int main(int argc, char **argv)
         int current_max_iter = 150 + (int)(40.0 * fabs(log10(zoom)));
 
         // Ограничим сверху для производительности
-        if (current_max_iter > 5000)
-            current_max_iter = 5000;
+        if (current_max_iter > 15000)
+            current_max_iter = 15000;
 
         render(ren, tex, pixels, zoom, cx, cy, current_max_iter, W, H);
     }
@@ -153,5 +159,14 @@ int main(int argc, char **argv)
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
+
+    // 2. Фиксируем время окончания
+    time_t end_time = time(NULL);
+    printf("\nОкончание: %s\n", ctime(&end_time));
+
+    // 3. Вычисляем разницу (длительность)
+    double diff = difftime(end_time, start_time);
+    printf("Программа работала %.0f сек.\n", diff);
+
     return 0;
 }

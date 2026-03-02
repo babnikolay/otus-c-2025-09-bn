@@ -7,6 +7,7 @@
 #include <math.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <time.h>
 
 void generate_frame(int frame_num, double zoom, double x, double y)
 {
@@ -16,7 +17,7 @@ void generate_frame(int frame_num, double zoom, double x, double y)
     double centerX = x;
     double centerY = y;
 
-    char filename[50];
+    char filename[30];
     sprintf(filename, "frames/frame_%05d.ppm", frame_num);
     FILE *fp = fopen(filename, "wb");
     if (!fp)
@@ -64,6 +65,10 @@ void generate_frame(int frame_num, double zoom, double x, double y)
 
 int main(int argc, char **argv)
 {
+    // 1. Фиксируем время начала
+    time_t start_time = time(NULL);
+    printf("Начало: %s\n", ctime(&start_time));
+
     if (argc != 6)
     {
         fprintf(stderr, "usage: %s frame_number zoom zoom_factor centerX centerY\n", argv[0]);
@@ -115,6 +120,14 @@ int main(int argc, char **argv)
         generate_frame(i, current_zoom, centerX, centerY);
         current_zoom *= zoom_factor;
     }
+
+    // 2. Фиксируем время окончания
+    time_t end_time = time(NULL);
+    printf("Окончание: %s\n", ctime(&end_time));
+
+    // 3. Вычисляем разницу (длительность)
+    double diff = difftime(end_time, start_time);
+    printf("Программа работала %.0f сек.\n", diff);
 
     return 0;
 }

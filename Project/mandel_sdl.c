@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <omp.h>
 #include <stdio.h>
+#include <time.h>
 
 void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels, double zoom, double cx, double cy, int W, int H)
 {
@@ -64,6 +65,11 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels, doub
 
 int main(int argc, char **argv)
 {
+    // 1. Фиксируем время начала
+    time_t start_time = time(NULL);
+    printf("Начало: %s\n", ctime(&start_time));
+    fflush(stdout);
+
     if (argc != 3)
     {
         fprintf(stderr, "usage: %s width height\n", argv[0]);
@@ -128,5 +134,14 @@ int main(int argc, char **argv)
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
+
+    // 2. Фиксируем время окончания
+    time_t end_time = time(NULL);
+    printf("\nОкончание: %s\n", ctime(&end_time));
+
+    // 3. Вычисляем разницу (длительность)
+    double diff = difftime(end_time, start_time);
+    printf("Программа работала %.0f сек.\n", diff);
+
     return 0;
 }
