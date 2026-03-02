@@ -1,4 +1,4 @@
-# [Создайте свой собственный набор Мандельброта](https://codingchallenges.fyi/challenges/challenge-mandelbrot/)
+# [Создание своего собственного набора Мандельброта](https://codingchallenges.fyi/challenges/challenge-mandelbrot/)
 
 ## Содержание
 
