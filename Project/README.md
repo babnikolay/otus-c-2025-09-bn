@@ -1,4 +1,4 @@
-# [Создание своего собственного набора Мандельброта](https://codingchallenges.fyi/challenges/challenge-mandelbrot/)
+# [Создание приложения на языке С для изучения множества Мандельброта](https://codingchallenges.fyi/challenges/challenge-mandelbrot/)
 
 ## Содержание
 
