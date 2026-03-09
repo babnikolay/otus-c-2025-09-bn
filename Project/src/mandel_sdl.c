@@ -102,27 +102,13 @@ int main(int argc, char **argv)
             {
                 switch (e.key.keysym.sym)
                 {
-                case SDLK_ESCAPE:
-                    running = 0;
-                    break;
-                case SDLK_UP:
-                    cy -= 0.1 * zoom;
-                    break;
-                case SDLK_DOWN:
-                    cy += 0.1 * zoom;
-                    break;
-                case SDLK_LEFT:
-                    cx -= 0.1 * zoom;
-                    break;
-                case SDLK_RIGHT:
-                    cx += 0.1 * zoom;
-                    break;
-                case SDLK_EQUALS:
-                    zoom *= 0.8;
-                    break; // Клавиша +
-                case SDLK_MINUS:
-                    zoom *= 1.2;
-                    break; // Клавиша -
+                case SDLK_ESCAPE: running = 0; break;
+                case SDLK_UP: cy -= 0.1 * zoom; break;
+                case SDLK_DOWN: cy += 0.1 * zoom; break;
+                case SDLK_LEFT: cx -= 0.1 * zoom; break;
+                case SDLK_RIGHT: cx += 0.1 * zoom; break;
+                case SDLK_EQUALS: zoom *= 0.8; break; // Клавиша +
+                case SDLK_MINUS: zoom *= 1.2; break; // Клавиша -
                 }
             }
         }

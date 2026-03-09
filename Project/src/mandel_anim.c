@@ -9,8 +9,7 @@
 #include <errno.h>
 #include <time.h>
 
-void generate_frame(int frame_num, double zoom, double x, double y)
-{
+void generate_frame(int frame_num, double zoom, double x, double y) {
     const int width = 800, height = 800;
     const int max_iter = 1000;
 
@@ -25,17 +24,14 @@ void generate_frame(int frame_num, double zoom, double x, double y)
 
     fprintf(fp, "P6\n%d %d\n255\n", width, height);
 
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
             double ca = centerX + (x - width / 2.0) * (zoom / width);
             double cb = centerY + (y - height / 2.0) * (zoom / width);
 
             double a = 0, b = 0;
             int iter = 0;
-            while (a * a + b * b <= 100 && iter < max_iter)
-            {
+            while (a * a + b * b <= 100 && iter < max_iter) {
                 double next_a = a * a - b * b + ca;
                 b = 2 * a * b + cb;
                 a = next_a;
@@ -43,8 +39,7 @@ void generate_frame(int frame_num, double zoom, double x, double y)
             }
 
             unsigned char r = 0, g = 0, bl = 0;
-            if (iter < max_iter)
-            {
+            if (iter < max_iter) {
                 double modulus = sqrt(a * a + b * b);
                 double mu = iter + 1 - log(log(modulus)) / log(2.0);
                 r = (unsigned char)(sin(0.1 * mu + 0.0) * 127 + 128);
@@ -63,14 +58,12 @@ void generate_frame(int frame_num, double zoom, double x, double y)
     return;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     // 1. Фиксируем время начала
     time_t start_time = time(NULL);
     printf("Начало: %s\n", ctime(&start_time));
 
-    if (argc != 6)
-    {
+    if (argc != 6) {
         fprintf(stderr, "usage: %s frame_number zoom zoom_factor centerX centerY\n", argv[0]);
         printf("frame_number - Количество кадров для видео\n");
         printf("zoom         - Начальный масштаб, например, 2.5\n");
@@ -97,27 +90,22 @@ int main(int argc, char **argv)
     double centerX = atof(argv[4]);      // Координата по оси X, по которой центрируется изображение
     double centerY = atof(argv[5]);      // Координата по оси Y, по которой центрируется изображение
 
-    if (mkdir("frames", 0755) != 0)
-    {
-        if (errno == EEXIST)
-        {
+    if (mkdir("frames", 0755) != 0) {
+        if (errno == EEXIST) {
             printf("Каталог уже существует\n");
             return -1;
         }
-        else
-        {
+        else {
             perror("Ошибка создания каталога\n");
             return -1;
         }
     }
-    else
-    {
+    else {
         printf("Каталог 'frames' успешно создан.\n");
     }
     printf("\n");
 
-    for (int i = 0; i < total_frames; i++)
-    {
+    for (int i = 0; i < total_frames; i++) {
         generate_frame(i, current_zoom, centerX, centerY);
         current_zoom *= zoom_factor;
     }
