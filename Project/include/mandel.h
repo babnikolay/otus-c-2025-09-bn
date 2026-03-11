@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <unistd.h> // Для access()
+#include <sys/stat.h>
 
 typedef enum {
     RENDER_END = 0,
@@ -34,6 +36,8 @@ uint32_t compute_pixel(int x, int y, int W, int H, double zoom, double cx, doubl
 void clear_stdin();
 
 int get_int_default(const char *prompt, int default_val);
+
+void ensure_directory(const char *dir);
 
 void save_png_with_dpi(double zoom, double cx, double cy, int iter, double R, double G, double B);
 

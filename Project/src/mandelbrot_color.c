@@ -3,7 +3,7 @@
 
 int main()
 {
-    const int width = 1200, height = 1200;
+    const int width = 1000, height = 1000;
     const int max_iter = 512; // Для цвета лучше брать не слишком большое число
     FILE *fp = fopen("mandelbrot_color.ppm", "wb");
 
@@ -46,8 +46,8 @@ int main()
                 которые создают плавные градиенты с помощью полиномиальных функций, близких к базису Бернштейна.
                 Множители (9, 15, 8.5) можно менять для поиска других оттенков
                 */
-                r = (unsigned char)(9 * (1 - t) * t * t * t * 255);
-                g = (unsigned char)(15 * (1 - t) * (1 - t) * t * t * 255);
+                r = (unsigned char)(9.0 * (1 - t) * t * t * t * 255);
+                g = (unsigned char)(15.0 * (1 - t) * (1 - t) * t * t * 255);
                 b_col = (unsigned char)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
             }
 

@@ -3,6 +3,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#define make_dir(path) mkdir(path, 0777)
+
 void help() {
     printf("\n");
     printf("=============== ПОМОЩЬ ===============\n");
@@ -84,7 +86,7 @@ void get_input(const char *prompt, void *variable, const char *type, const char 
     }
 }
 
-// Вычисления цвета вынесены для универсальности
+// Функция для вычисления цвета
 uint32_t compute_pixel(int x, int y, int W, int H, double zoom, double cx, double cy, 
                         int max_iter, double R, double G, double B) {
     // Логарифмические константы - используется для оптимизации log(log(sqrt(z)))
@@ -147,6 +149,16 @@ int get_int_default(const char *prompt, int default_val) {
     return default_val; // Возвращаем по умолчанию, если нажат Enter
 }
 
+void ensure_directory(const char *dir) {
+    struct stat st = {0};
+    // Если папки нет, создаем её
+    if (stat(dir, &st) == -1) {
+        if (make_dir(dir) == 0) {
+            printf("\nПапка '%s' создана.\n", dir);
+        }
+    }
+}
+
 void save_png_with_dpi(double zoom, double cx, double cy, int iter, double R, double G, double B) {
 
     printf("\n--- ПАРАМЕТРЫ СОХРАНЕНИЯ ---\n");
@@ -198,12 +210,30 @@ void save_png_with_dpi(double zoom, double cx, double cy, int iter, double R, do
         }
     }
 
-    char fname[256];
-    snprintf(fname, sizeof(fname), "mandelbrot_%dx%d_%ddpi.png", w, h, dpi);
+    char basename[256];
+    char final_path[512];
+
+    const char *folder = "sdl_mouse";
+    char *name = "mandelbrot_";
+    char *ext = "png";
+    snprintf(basename, sizeof(basename), "%s%dx%d_%ddpi", name, w, h, dpi);
+    printf("basename = %s", basename);
+
+    ensure_directory(folder);
+
+    // Формируем путь внутри папки
+    snprintf(final_path, sizeof(final_path), "%s/%s.%s", folder, basename, ext);
+
+    // Проверяем на дубликаты
+    int counter = 1;
+    while (access(final_path, F_OK) == 0) {
+        snprintf(final_path, sizeof(final_path), "%s/%s_%05d.%s", folder, basename, counter, ext);
+        counter++;
+    }
 
     // Записываем файл
-    if (stbi_write_png(fname, w, h, 4, img, w * 4)) {
-        printf("\nУспешно сохранено: %s\n", fname);
+    if (stbi_write_png(final_path, w, h, 4, img, w * 4)) {
+        printf("\nУспешно сохранено: %s\n", final_path);
     }
     else {
         printf("\nОшибка при сохранении!\n");

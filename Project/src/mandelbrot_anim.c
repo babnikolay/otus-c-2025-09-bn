@@ -64,12 +64,25 @@ int main(int argc, char **argv) {
     printf("Начало: %s\n", ctime(&start_time));
 
     if (argc != 6) {
-        fprintf(stderr, "usage: %s frame_number zoom zoom_factor centerX centerY\n", argv[0]);
+        fprintf(stderr, "usage: %s frame_number zoom zoom_factor centerX centerY\n\n", argv[0]);
         printf("frame_number - Количество кадров для видео\n");
         printf("zoom         - Начальный масштаб, например, 2.5\n");
         printf("zoom_factor  - Коэффициент приближения (0.9 на 10%% каждый кадр)\n");
         printf("centerX      - Координата по оси X, по которой центрируется изображение\n");
         printf("centerY      - Координата по оси Y, по которой центрируется изображение\n");
+        printf("\n");
+        printf("Например:\n");
+        printf("./mandelbrot_anim 1000 2.5 0.99 -1.768778833 -0.001738974\n");
+        printf("\n");
+        
+        // 2. Фиксируем время окончания
+        time_t end_time = time(NULL);
+        printf("Окончание: %s\n", ctime(&end_time));
+
+        // 3. Вычисляем разницу (длительность)
+        double diff = difftime(end_time, start_time);
+        printf("Программа работала %.0f сек.\n", diff);
+
         return 1;
     }
 

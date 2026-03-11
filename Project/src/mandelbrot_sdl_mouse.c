@@ -8,6 +8,7 @@
 #define RESET      "\033[0m"
 
 int main() {
+    
     // 1. Фиксируем время начала
     time_t start_time = time(NULL);
     printf("Начало: %s\n", ctime(&start_time));
@@ -43,6 +44,7 @@ int main() {
 
             return 0;
         } else if (strcasecmp(input, "y") == 0) {
+            // Изменение начальных значений
             get_input("Ширина окна - width: ", &W, "int", "800");
             get_input("Высота окна - height: ", &H, "int", "800");
             get_input("Масштабирование - zoom: ", &zoom, "double", "2.5");
@@ -56,6 +58,7 @@ int main() {
 
             break;
         } else if (input[0] == '\0' || strcasecmp(input, "n") == 0) {
+            // Ввод параметров по умолчанию
             printf("Применены параметры по умолчанию!!!\n");
             printf("\nДанные по умолчанию: W: %d, H: %d, Zoom: %.2f, MAX_ITER: %d\n", W, H, zoom, max_iter);
             printf("R: %.2f, G: %.2f, B: %.2f\n", R, G, B);
@@ -65,6 +68,7 @@ int main() {
         }
     }
 
+    // Задание начальных параметров для окна
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *win = SDL_CreateWindow("Mandelbrot [S - Save]", 100, 100, W, H, 0);
     SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
@@ -81,6 +85,7 @@ int main() {
             if (event.type == SDL_QUIT)
                 running = 0;
             
+            // Обработка событий клавиатуры
             if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_s: // Нажать S для сохранения
@@ -96,6 +101,7 @@ int main() {
                 }
             }
             
+            // Обработка событий мыши
             if (event.type == SDL_MOUSEBUTTONDOWN) {
                 double m_ca = cx + (event.button.x - W / 2.5) * (zoom / W);
                 double m_cb = cy + (event.button.y - H / 2.5) * (zoom / W);
@@ -121,6 +127,7 @@ int main() {
 
     }
 
+    // Очистка параметров окна
     free(pixels);
     SDL_DestroyTexture(tex);
     SDL_DestroyRenderer(ren);
