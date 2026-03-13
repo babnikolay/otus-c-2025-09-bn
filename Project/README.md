@@ -208,23 +208,30 @@ gcc -O3 mandelbrot_anim.c -o mandelbrot_anim -Wall -Wextra -Wpedantic -lm
 ```sh
 $ ./mandelbrot_anim
 
-usage: ./mandelbrot_anim frame_number zoom zoom_factor centerX centerY
+usage: ./mandelbrot_anim degree frame_number zoom zoom_factor centerX centerY frequency phase_r phase_g phase_b
 
-degree       - Степень уравнения Мандельброта: 2 или 3
+degree       - Степень уравнения Мандельброта: 2, 3.5 или другие
 frame_number - Количество кадров для видео
 zoom         - Начальный масштаб, например, 2.5
 zoom_factor  - Коэффициент приближения (0.9 на 10% каждый кадр)
 centerX      - Координата по оси X, по которой центрируется изображение
 centerY      - Координата по оси Y, по которой центрируется изображение
+frequency    - Частота. Определяет, как быстро меняется цвет при переходе от одной итерации к другой
+              Низкая частота (например, 0.1): Цвет меняется медленно. Переходы будут широкими, плавными, "растянутыми".
+              Высокая частота (например, 1.0 или 2.0): Цвет меняется очень быстро.
+              Фрактал покроется множеством узких контрастных колец (эффект "зебры")
+phase_r      - Фазовый сдвиг красного. Определяет баланс цветов
+phase_g      - Фазовый сдвиг зелёного. Определяет баланс цветов
+phase_b      - Фазовый сдвиг синего. Определяет баланс цветов
 
 Например:
-./mandelbrot_anim 3 1000 2.5 0.99 -1.768778833 -0.001738974
+./mandelbrot_anim 3.3 1000 2.5 0.99 -1.768778833 -0.001738974 0.3 0.0 2.1 4.2
 ```
 
 Пример запуска программы:  
 
 ```sh
-./mandelbrot_anim 3 1000 0.1 0.99 -0.088 0.654
+./mandelbrot_anim 2.5 1000 0.1 0.99 -0.088 0.654 0.3 0.0 2.1 4.2
 ```
 
 #### Рекомендуемые параметры для красивых мест  
@@ -288,7 +295,7 @@ sudo apt install ffmpeg
 Если файлы пронумерованы (например, img001.ppm, img002.ppm), используйте шаблон:  
 
 ```sh
-ffmpeg -framerate 10 -i img%03d.ppm output.gif
+ffmpeg -framerate 10 -i img%05d.ppm output.gif
 ```
 
 -framerate 10: количество кадров в секунду.  
@@ -343,10 +350,10 @@ convert result.gif -fuzz 5% -layers Optimize optimized.gif
 
 ```sh
 # 1. Создаем оптимальную палитру
-ffmpeg -i img%03d.ppm -vf "palettegen" palette.png
+ffmpeg -i img%05d.ppm -vf "palettegen" palette.png
 
 # 2. Применяем палитру и масштабируем (например, ширина 500px)
-ffmpeg -i img%03d.ppm -i palette.png -filter_complex "scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" output.gif
+ffmpeg -i img%05d.ppm -i palette.png -filter_complex "scale=500:-1:flags=lanczos[x];[x][1:v]paletteuse" output.gif
 ```
 
 #### Как сделать видео  
@@ -363,7 +370,7 @@ sudo apt install ffmpeg -y
 Чтобы преобразовать полученные кадры в видео, необходимо выполнить в командной строке команду:  
 
 ```sh
-ffmpeg -framerate 30 -i frames/frame_%05d.ppm -c:v libx264 -pix_fmt yuv420p output.mp4
+ffmpeg -framerate 30 -i frames/frame_%g_%05d.ppm -c:v libx264 -pix_fmt yuv420p output.mp4
 ```
 
 В результате получим видео файл с постепенным увеличением фрактала в окне 800х800 с центром в заданной координате.  
