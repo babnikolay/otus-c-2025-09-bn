@@ -6,7 +6,6 @@
 
 #include <stdio.h>
 #include <math.h>
-// #include <stdlib.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -14,18 +13,19 @@
 int main(int argc, char **argv) {
     if (argc != 6) {
         fprintf(stderr, "usage: %s degree frequency phase_r phase_g phase_b\n\n", argv[0]);
-        printf("degree    - Степень уравнения Мандельброта: 2 или 3\n");
-        printf("frequency - Частота. Определяет, как быстро меняется цвет при переходе от одной итерации к другой\n");
+        printf("degree    - Степень уравнения Мандельброта, может быть дробной.\n");
+        printf("frequency - Частота. Определяет, как быстро меняется цвет при переходе от одной итерации к другой.\n");
         printf("            Низкая частота (например, 0.1): Цвет меняется медленно. Переходы будут широкими, плавными, \"растянутыми\".\n");
         printf("            Высокая частота (например, 1.0 или 2.0): Цвет меняется очень быстро.\n");
-        printf("            Фрактал покроется множеством узких контрастных колец (эффект \"зебры\")\n");
-        printf("phase_r   - Фазовый сдвиг красного. Определяет баланс цветов\n");
-        printf("phase_g   - Фазовый сдвиг зелёного. Определяет баланс цветов\n");
-        printf("phase_b   - Фазовый сдвиг синего. Определяет баланс цветов\n");
+        printf("            Фрактал покроется множеством узких контрастных колец (эффект \"зебры\").\n");
+        printf("phase_r   - Фазовый сдвиг красного. Определяет баланс цветов.\n");
+        printf("phase_g   - Фазовый сдвиг зелёного. Определяет баланс цветов.\n");
+        printf("phase_b   - Фазовый сдвиг синего. Определяет баланс цветов.\n");
         printf("\n");
         printf("Например:\n");
         printf("./mandelbrot_smooth 3.5 0.1 0.0 2.1 4.2\n");
         printf("\n");
+        
         return 1;
     }
 
@@ -35,10 +35,10 @@ int main(int argc, char **argv) {
     double phase_g = atof(argv[4]);
     double phase_b = atof(argv[5]);
     printf("Степень уравнения Мандельброта: %0.3f\n", degree);
-    printf("Частота: %0.1f\n", frequency);
-    printf("Фазовый сдвиг красного: %0.1f\n", phase_r);
-    printf("Фазовый сдвиг зелёного: %0.1f\n", phase_g);
-    printf("Фазовый сдвиг синего: %0.1f\n", phase_b);
+    printf("Частота: %0.3f\n", frequency);
+    printf("Фазовый сдвиг красного: %0.3f\n", phase_r);
+    printf("Фазовый сдвиг зелёного: %0.3f\n", phase_g);
+    printf("Фазовый сдвиг синего: %0.3f\n", phase_b);
 
     const int width = 1000, height = 1000;
     const int max_iter = 1000;
@@ -55,26 +55,30 @@ int main(int argc, char **argv) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             // Центрирование и масштабирование (диапазон примерно от -2 до 2)
-            double ca = (x - width / 2.0) * 4.0 / width;
-            double cb = (y - height / 2.0) * 4.0 / height;
+            double cx = (x - width / 2.0) * 4.0 / width;
+            double cy = (y - height / 2.0) * 4.0 / height;
 
-            double a = 0, b = 0;
+            double zx = 0, zy = 0;
             int iter = 0;
-            double modulus = 0;
+            double modul = 0;
 
             // --- УНИВЕРСАЛЬНЫЙ ЦИКЛ ДЛЯ ЛЮБОЙ СТЕПЕНИ ---
             while (iter < max_iter) {
-                modulus = a * a + b * b;
-                if (modulus > radius_escape * radius_escape) break;
+                modul = zx * zx + zy * zy;
+                if (modul > radius_escape * radius_escape) break;
 
                 // Переход в полярные координаты для возведения в степень n
-                double r = sqrt(modulus);
-                double theta = atan2(b, a);
+                double r = sqrt(modul);
+                double theta = atan2(zy, zx);
                 
-                // Формула: z = z^n + c
+                /*
+                Формула: z = z^n + c
+                𝐱_𝐧𝐞𝐱𝐭=𝐫^𝐧⋅𝐜𝐨𝐬⁡(𝐧⋅𝛉)+𝐱_𝐢𝐧𝐢𝐭
+                𝐲_𝐧𝐞𝐱𝐭=𝐫^𝐧⋅𝐬𝐢𝐧(𝐧⋅𝛉)+𝐲_𝐢𝐧𝐢𝐭
+                */
                 double r_pow = pow(r, degree);
-                a = r_pow * cos(degree * theta) + ca;
-                b = r_pow * sin(degree * theta) + cb;
+                zx = r_pow * cos(degree * theta) + cx;
+                zy = r_pow * sin(degree * theta) + cy;
                 
                 iter++;
             }
@@ -89,7 +93,7 @@ int main(int argc, char **argv) {
                 позволяет цвету меняться непрерывно.
                 Улучшенная формула сглаживания для произвольной степени n
                 */
-                double mu = iter + 1 - log(log(sqrt(a*a + b*b))) / log(degree);
+                double mu = iter + 1 - log(log(sqrt(zx*zx + zy*zy))) / log(degree);
 
                 /*
                 Создаем цикличный цветовой градиент на основе синусов sin(frequency * t + phase) для плавных цветовых переходов
@@ -107,7 +111,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("Готово! Фрактал степени %.1f сохранен в %s\n", degree, filename);
+    printf("Готово! Фрактал степени %.3f сохранен в %s\n", degree, filename);
     fclose(fp);
 
     return 0;

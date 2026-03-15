@@ -14,12 +14,15 @@ int main() {
     printf("Начало: %s\n", ctime(&start_time));
     fflush(stdout);
 
-    double zoom = 2.5, cx = -1.0, cy = -0.3;
-    int W = 800, H = 800, max_iter = 1000;
-    double R = 0.8, G = 0.5, B = 2.1;
+    extern double zoom, ca, cb;
+    extern int W, H, max_iter;
+    extern double R, G, B;
+    extern double degree;
 
     int running = 1;
     SDL_Event event;
+
+    // generate_palette();
 
     char input[10];
 
@@ -49,23 +52,31 @@ int main() {
             get_input("Высота окна - height: ", &H, "int", "800");
             get_input("Масштабирование - zoom: ", &zoom, "double", "2.5");
             get_input("Максимальное количество итераций - MAX_ITER: ", &max_iter, "int", "1000");
-            get_input("Красный для палитры: ", &R, "double", "0.8");
-            get_input("Зелёный для палитры: ", &G, "double", "0.5");
-            get_input("Синий для палитры: ", &B, "double", "2.1");
+            get_input("Красный для палитры: ", &R, "double", "0.0");
+            get_input("Зелёный для палитры: ", &G, "double", "2.094");
+            get_input("Синий для палитры: ", &B, "double", "4.188");
+            get_input("Степень Z в формуле Мандельброта: ", &degree, "double", "2.0");
 
-            printf("\nДанные приняты:\nW: %d, H: %d, Zoom: %.2f, MAX_ITER: %d\n", W, H, zoom, max_iter);
-            printf("R: %.2f, G: %.2f, B: %.2f\n", R, G, B);
+            printf("\nДанные приняты:\n");
+            printf("W: %d, H: %d, Zoom: %.2f, MAX_ITER: %d\n", W, H, zoom, max_iter);
+            printf("R: %.3f, G: %.3f, B: %.3f, degree: %.3f\n", R, G, B, degree);
 
             break;
         } else if (input[0] == '\0' || strcasecmp(input, "n") == 0) {
             // Ввод параметров по умолчанию
             printf("Применены параметры по умолчанию!!!\n");
-            printf("\nДанные по умолчанию: W: %d, H: %d, Zoom: %.2f, MAX_ITER: %d\n", W, H, zoom, max_iter);
-            printf("R: %.2f, G: %.2f, B: %.2f\n", R, G, B);
+            printf("\nДанные по умолчанию:\n");
+            printf("W: %d, H: %d, Zoom: %.2f, MAX_ITER: %d\n", W, H, zoom, max_iter);
+            printf("R: %.3f, G: %.3f, B: %.3f, degree: %.3f\n", R, G, B, degree);
             break;
         } else {
             printf("Неизвестная команда. Повторите ввод.\n");
         }
+    }
+
+    if (degree >= 3) {
+        ca = 0.0;
+        cb = 0.0;
     }
 
     // Задание начальных параметров для окна
@@ -89,13 +100,13 @@ int main() {
             if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_s: // Нажать S для сохранения
-                        save_png_with_dpi(zoom, cx, cy, cur_iter, R, G, B);
+                        save_png_with_dpi(zoom, ca, cb, cur_iter, R, G, B);
                         break;
                     case SDLK_ESCAPE: running = 0; break;
-                    case SDLK_UP: cy -= 0.1 * zoom; break;
-                    case SDLK_DOWN: cy += 0.1 * zoom; break;
-                    case SDLK_LEFT: cx -= 0.1 * zoom; break;
-                    case SDLK_RIGHT: cx += 0.1 * zoom; break;
+                    case SDLK_UP: cb -= 0.1 * zoom; break;
+                    case SDLK_DOWN: cb += 0.1 * zoom; break;
+                    case SDLK_LEFT: ca -= 0.1 * zoom; break;
+                    case SDLK_RIGHT: ca += 0.1 * zoom; break;
                     case SDLK_EQUALS: zoom *= 0.8; break;
                     case SDLK_MINUS: zoom *= 1.2; break;
                 }
@@ -103,10 +114,10 @@ int main() {
             
             // Обработка событий мыши
             if (event.type == SDL_MOUSEBUTTONDOWN) {
-                double m_ca = cx + (event.button.x - W / 2.5) * (zoom / W);
-                double m_cb = cy + (event.button.y - H / 2.5) * (zoom / W);
-                cx = m_ca;
-                cy = m_cb;
+                double m_ca = ca + (event.button.x - W / 2.5) * (zoom / W);
+                double m_cb = cb + (event.button.y - H / 2.5) * (zoom / H);
+                ca = m_ca;
+                cb = m_cb;
                 if (event.button.button == SDL_BUTTON_LEFT)
                     zoom *= 0.9;
                 else
@@ -116,14 +127,15 @@ int main() {
         
         RENDER_SAFE(ren, tex, pixels, 
                     RENDER_ZOOM, zoom, 
-                    RENDER_CX, cx, 
-                    RENDER_CY, cy, 
+                    RENDER_CA, ca, 
+                    RENDER_CB, cb, 
                     RENDER_ITER, cur_iter, 
                     RENDER_WIDTH, W, 
                     RENDER_HEIGHT, H,
                     RENDER_R, R,
                     RENDER_G, G,
-                    RENDER_B, B);
+                    RENDER_B, B,
+                    RENDER_DEGREE, degree);
 
     }
 

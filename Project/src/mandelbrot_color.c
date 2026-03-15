@@ -38,32 +38,32 @@ int main(int argc, char **argv) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
 
-            double a = 0, b = 0;
+            double zx = 0, zy = 0;
             int iter = 0;
 
             if (degree == 2) {
-                double ca = -2.0 + (x / (double)width) * 2.5;
-                double cb = -1.25 + (y / (double)height) * 2.5;
+                double cx = -2.0 + (x / (double)width) * 2.5;
+                double cy = -1.25 + (y / (double)height) * 2.5;
 
                 // Вычисление следующих значений комплексного числа z по формуле: z(n+1) = z(n)^2 + c
-                while (a * a + b * b <= 4 && iter < max_iter)
+                while (zx * zx + zy * zy <= 4 && iter < max_iter)
                 {
-                    double next_a = a * a - b * b + ca;
-                    b = 2 * a * b + cb;
-                    a = next_a;
+                    double next_zx = zx * zx - zy * zy + cx;
+                    zy = 2 * zx * zy + cy;
+                    zx = next_zx;
                     iter++;
                 }
             }
             else if (degree == 3) {
-                double ca = (x - (double)width / 2.0) * 4.0 / (double)width;
-                double cb = (y - (double)height / 2.0) * 4.0 / (double)height;
+                double cx = (x - (double)width / 2.0) * 4.0 / (double)width;
+                double cy = (y - (double)height / 2.0) * 4.0 / (double)height;
 
                 // Итерация z = z^3 + c
-                while (a*a + b*b <= 4.0 && iter < max_iter) {
-                    double a_next = a*a*a - 3.0*a*b*b + ca;
-                    double b_next = 3.0*a*a*b - b*b*b + cb;
-                    a = a_next;
-                    b = b_next;
+                while (zx*zx + zy*zy <= 4.0 && iter < max_iter) {
+                    double zx_next = zx*zx*zx - 3.0*zx*zy*zy + cx;
+                    double zy_next = 3.0*zx*zx*zy - zy*zy*zy + cy;
+                    zx = zx_next;
+                    zy = zy_next;
                     iter++;
                 }
             }
@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
 
                 /*
                 Математическая раскраска через цвета задаётся через полиномиальные выражения вида:
-                P(t) = C * (1−t)^a * t^b, где a + b = 4 (степень 4), а C — константа-множитель для настройки яркости,
+                P(t) = C * (1−t)^zx * t^zy, где zx + zy = 4 (степень 4), а C — константа-множитель для настройки яркости,
                 которые создают плавные градиенты с помощью полиномиальных функций, близких к базису Бернштейна.
                 Множители (9, 15, 8.5) можно менять для поиска других оттенков
                 */

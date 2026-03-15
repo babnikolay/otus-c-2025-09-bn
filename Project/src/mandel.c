@@ -3,7 +3,13 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define make_dir(path) mkdir(path, 0777)
+Color palette[PALETTE_SIZE];
+
+double zoom = 3.0, ca = -0.7, cb = 0.0;
+int max_iter = 1000, W = 800, H = 800;
+double R = 255.0, G = 170.0, B = 0.0;
+// double phase = 0.1; // Сдвиг всей палитры
+double degree = 2.0;
 
 void help() {
     printf("\n");
@@ -17,9 +23,9 @@ void help() {
     printf("height      - Высота окна. [800]\n");
     printf("zoom        - Масштабирование изображения. [2.5]\n");
     printf("MAX_ITER    - Максимальное количество итераций, за которое точка выйдет за границы множества. [1000]\n");
-    printf("R           - Красный для палитры. [0.8]\n");
-    printf("G           - Зелёный для палитры. [0.5]\n");
-    printf("B           - Синий для палитры. [2.1]\n");
+    printf("R           - Красный для палитры. [0.0]\n");
+    printf("G           - Зелёный для палитры. [2.094]\n");
+    printf("B           - Синий для палитры. [4.188]\n");
     printf("\n");
     printf("Сохранение:\n");
     printf("Для сохранения изображения необходимо нажать клавишу 's'\n");
@@ -34,6 +40,41 @@ void help() {
     printf("Кроме того, клик по изображению левой клавишей 'мыши' приближает изображение,\n");
     printf("а клик правой клавишей 'мыши' - отдаляет изображение. Изображение центрируется по нажатой точке.\n");
     printf("======================================\n");
+}
+
+Color get_spectral_color (int iter, int max_iter, double modul, double degree, double R, double G, double B) {
+    Color color;
+
+    if (iter >= max_iter) return (Color){0, 0, 0}; // Самое множество — черное
+
+    // iter — это ваша итерация (лучше использовать сглаженную дробную итерацию)
+    double freq = 0.1; // Скорость смены цветов (чем меньше, тем шире полосы)
+
+    /*
+    Алгоритм сглаживания (нормализованное количество итераций): mu = n + 1 - log(log|z|) / log(2)
+    Для степеней отличных от 2, формула mu немного меняется: log(log|z|)/log(degree)
+    Формула mu: Вычисляет "дробную итерацию".
+    Теперь iter — это не целое число, а вещественное, что позволяет цвету меняться непрерывно.
+    Вместо log(log(sqrt(a² + b²))) можно использовать свойства логарифмов, чтобы убрать корень:
+    sqrt(z) = z^0.5
+    log(z^0.5) = 0.5 * log(z)
+    log(0.5 * log(z)) = log(0.5) + log(log(z))
+    */
+    double inv_log_degree = 1.0 / log(degree);
+    const double log_05 = log(0.5);
+    double log_modul = log(modul);
+    double mu = iter + 1 - ((log(log_modul) + log_05) * inv_log_degree);
+
+    // color.r = (unsigned char)(sin(freq * mu + R) * 127 + 128);
+    // color.g = (unsigned char)(sin(freq * mu + G) * 127 + 128); // 2.09 ≈ 2π/3
+    // color.b = (unsigned char)(sin(freq * mu + B) * 127 + 128); // 4.18 ≈ 4π/3
+
+    // Более «ядовитые» и четкие цвета
+    color.r = (unsigned char)(pow(0.5 * cos(freq * mu + R) + 0.5, 2.0) * 255);
+    color.g = (unsigned char)(pow(0.5 * cos(freq * mu + G) + 0.5, 2.0) * 255);
+    color.b = (unsigned char)(pow(0.5 * cos(freq * mu + B) + 0.5, 2.0) * 255);
+    
+    return color;
 }
 
 // Функция проверяет, является ли строка числом (целым или с точкой)
@@ -87,50 +128,38 @@ void get_input(const char *prompt, void *variable, const char *type, const char 
 }
 
 // Функция для вычисления цвета
-uint32_t compute_pixel(int x, int y, int W, int H, double zoom, double cx, double cy, 
-                        int max_iter, double R, double G, double B) {
-    // Логарифмические константы - используется для оптимизации log(log(sqrt(z)))
-    const double inv_log2 = 1.0 / log(2.0);
-    const double log_05 = log(0.5);
-
-    double ca = cx + (x - W / 2.5) * (zoom / W);
-    double cb = cy + (y - H / 2.5) * (zoom / W);
-    double a = 0, b = 0, a2 = 0, b2 = 0;
+uint32_t compute_pixel(int x, int y, int W, int H, double zoom, double ca, double cb, 
+                          int max_iter, double R, double G, double B, double degree) {
+    // Центрирование и масштабирование
+    double cx = ca + (x - W / 2.0) * (zoom / W);
+    double cy = cb + (y - H / 2.0) * (zoom / H);
+    
+    double zx = 0, zy = 0;
     int iter = 0;
+    double r2 = 0;
 
-    while (a2 + b2 <= 4 && iter < max_iter) {
-        b = 2 * a * b + cb;
-        a = a2 - b2 + ca;
-        a2 = a * a;
-        b2 = b * b;
+       while (r2 <= 16 && iter < max_iter) { // Радиус выхода 16 - лучше для высоких степеней
+        // Переход в полярные координаты
+        double r = sqrt(zx * zx + zy * zy);
+        double theta = atan2(zy, zx);
+        
+        // Возведение в степень degree: z^n = r^n * (cos(n*theta) + i*sin(n*theta))
+        double rn = pow(r, degree);
+        if (iter == 0 && zx == 0 && zy == 0) { // Обработка начальной точки 0^n
+             zx = cx;
+             zy = cy;
+        } else {
+             zx = rn * cos(degree * theta) + cx;
+             zy = rn * sin(degree * theta) + cy;
+        }
+        
+        r2 = zx * zx + zy * zy;
         iter++;
     }
 
-    if (iter == max_iter)
-        return 0xFF000000;
+    Color color = get_spectral_color (iter, max_iter, r2, degree, R, G, B);
 
-    /*
-    Алгоритм сглаживания: mu = n + 1 - log(log|z|) / log(2)
-    Формула mu: Вычисляет "дробную итерацию". 
-    Теперь iter — это не целое число, а вещественное, что позволяет цвету меняться непрерывно.
-    Вместо log(log(sqrt(a² + b²))) можно использовать свойства логарифмов, чтобы убрать корень:
-    sqrt(z) = z^0.5
-    log(z^0.5) = 0.5 * log(z)
-    log(0.5 * log(z)) = log(0.5) + log(log(z))
-    */
-    double r2 = a2 + b2;
-    double mu = iter + 1 - ((log_05 + log(log(r2))) * inv_log2);
-
-    /*
-    Создаем цикличный цветовой градиент на основе синусов sin(frequency * t + phase) для плавных цветовых переходов
-    Это классический способ создать бесконечную "радугу", где фазовый сдвиг (числа 0.8, 0.5, 2.1) определяет баланс цветов
-    Подбирая коэффициенты (0.8, 0.5, 2.1), можно менять палитру
-    */
-    uint8_t r = (uint8_t)(sin(0.1 * mu + R) * 127 + 128);
-    uint8_t g = (uint8_t)(sin(0.1 * mu + G) * 127 + 128);
-    uint8_t bl = (uint8_t)(sin(0.1 * mu + B) * 127 + 128);
-
-    return (0xFF000000) | (r << 16) | (g << 8) | bl;
+    return (0xFF000000) | (color.r << 16) | (color.g << 8) | color.b;
 }
 
 // Вспомогательная функция для очистки буфера после scanf
@@ -159,7 +188,7 @@ void ensure_directory(const char *dir) {
     }
 }
 
-void save_png_with_dpi(double zoom, double cx, double cy, int iter, double R, double G, double B) {
+void save_png_with_dpi(double zoom, double ca, double cb, int iter, double R, double G, double B) {
 
     printf("\n--- ПАРАМЕТРЫ СОХРАНЕНИЯ ---\n");
 
@@ -206,7 +235,7 @@ void save_png_with_dpi(double zoom, double cx, double cy, int iter, double R, do
 #pragma omp parallel for schedule(dynamic)
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
-            img[y * w + x] = compute_pixel(x, y, w, h, zoom, cx, cy, iter, R, G, B);
+            img[y * w + x] = compute_pixel(x, y, w, h, zoom, ca, cb, iter, R, G, B, degree);
         }
     }
 
@@ -244,9 +273,6 @@ void save_png_with_dpi(double zoom, double cx, double cy, int iter, double R, do
 
 // Обычный рендер для окна
 void render(SDL_Renderer *ren, SDL_Texture *tex, uint32_t *pix, ...) {
-    double zoom = 2.5, cx = -1.0, cy = -0.3;
-    int max_iter = 1000, W = 800, H = 800;
-    double R = 0.8, G = 0.5, B = 2.1;
 
     va_list args;
     va_start(args, pix);
@@ -254,10 +280,10 @@ void render(SDL_Renderer *ren, SDL_Texture *tex, uint32_t *pix, ...) {
     while ((p = va_arg(args, RenderParam)) != RENDER_END) {
         if (p == RENDER_ZOOM)
             zoom = va_arg(args, double);
-        else if (p == RENDER_CX)
-            cx = va_arg(args, double);
-        else if (p == RENDER_CY)
-            cy = va_arg(args, double);
+        else if (p == RENDER_CA)
+            ca = va_arg(args, double);
+        else if (p == RENDER_CB)
+            cb = va_arg(args, double);
         else if (p == RENDER_ITER)
             max_iter = va_arg(args, int);
         else if (p == RENDER_WIDTH)
@@ -270,13 +296,15 @@ void render(SDL_Renderer *ren, SDL_Texture *tex, uint32_t *pix, ...) {
             G = va_arg(args, double);
         else if (p == RENDER_B)
             B = va_arg(args, double);
+        else if (p == RENDER_DEGREE)
+            degree = va_arg(args, double);
     }
     va_end(args);
 
 #pragma omp parallel for schedule(dynamic)
     for (int y = 0; y < H; y++)
         for (int x = 0; x < W; x++)
-            pix[y * W + x] = compute_pixel(x, y, W, H, zoom, cx, cy, max_iter, R, G, B);
+            pix[y * W + x] = compute_pixel(x, y, W, H, zoom, ca, cb, max_iter, R, G, B, degree);
 
     SDL_UpdateTexture(tex, NULL, pix, W * 4);
     SDL_RenderCopy(ren, tex, NULL, NULL);

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define WIDTH 80
+#define WIDTH 100
 #define HEIGHT 40
 #define MAX_ITER 1000
 

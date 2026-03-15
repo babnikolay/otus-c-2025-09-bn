@@ -9,6 +9,7 @@
 #include <errno.h>
 #include <time.h>
 
+
 void generate_frame(int frame_num, double zoom, double x, double y, double degree, 
                     double frequency, double phase_r, double phase_g, double phase_b) {
     const int width = 800, height = 800;
@@ -28,26 +29,26 @@ void generate_frame(int frame_num, double zoom, double x, double y, double degre
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            double ca = centerX + (x - width / 2.0) * (zoom / width);
-            double cb = centerY + (y - height / 2.0) * (zoom / width);
+            double cx = centerX + (x - width / 2.0) * (zoom / width);
+            double cy = centerY + (y - height / 2.0) * (zoom / width);
 
-            double a = 0, b = 0;
+            double zx = 0, zy = 0;
             int iter = 0;
             double modulus = 0;
 
             // --- УНИВЕРСАЛЬНЫЙ ЦИКЛ ДЛЯ ЛЮБОЙ СТЕПЕНИ ---
             while (iter < max_iter) {
-                modulus = a * a + b * b;
+                modulus = zx * zx + zy * zy;
                 if (modulus > radius_escape * radius_escape) break;
 
                 // Переход в полярные координаты для возведения в степень n
                 double r = sqrt(modulus);
-                double theta = atan2(b, a);
+                double theta = atan2(zy, zx);
                 
                 // Формула: z = z^n + c
                 double r_pow = pow(r, degree);
-                a = r_pow * cos(degree * theta) + ca;
-                b = r_pow * sin(degree * theta) + cb;
+                zx = r_pow * cos(degree * theta) + cx;
+                zy = r_pow * sin(degree * theta) + cy;
                 
                 iter++;
             }
@@ -55,20 +56,8 @@ void generate_frame(int frame_num, double zoom, double x, double y, double degre
             unsigned char r_out = 0, g_out = 0, b_out = 0;
 
             if (iter < max_iter) {
-                /*
-                Алгоритм сглаживания: mu = n + 1 - log(log|z|) / log(degree)
-                Формула mu: Вычисляет "дробную итерацию". 
-                Теперь iter — это не целое число, а вещественное, что 
-                позволяет цвету меняться непрерывно.
-                Улучшенная формула сглаживания для произвольной степени n
-                */
-                double mu = iter + 1 - log(log(sqrt(a*a + b*b))) / log(degree);
+                double mu = iter + 1 - log(log(sqrt(zx*zx + zy*zy))) / log(degree);
 
-                /*
-                Создаем цикличный цветовой градиент на основе синусов sin(frequency * t + phase) для плавных цветовых переходов
-                Это классический способ создать бесконечную "радугу", где фазовый сдвиг (числа 9.0, 15.0, 8.5) определяет баланс цветов
-                Подбирая коэффициенты (9.0, 15.0, 8.5), можно менять палитру
-                */
                 r_out = (unsigned char)(sin(frequency * mu + phase_r) * 127 + 128);
                 g_out = (unsigned char)(sin(frequency * mu + phase_g) * 127 + 128);
                 b_out = (unsigned char)(sin(frequency * mu + phase_b) * 127 + 128);
@@ -100,10 +89,11 @@ int main(int argc, char **argv) {
         printf("zoom_factor  - Коэффициент приближения (0.9 на 10%% каждый кадр)\n");
         printf("centerX      - Координата по оси X, по которой центрируется изображение\n");
         printf("centerY      - Координата по оси Y, по которой центрируется изображение\n");
-        printf("frequency    - Частота. Определяет, как быстро меняется цвет при переходе от одной итерации к другой\n");
-        printf("                Низкая частота (например, 0.1): Цвет меняется медленно. Переходы будут широкими, плавными, \"растянутыми\".\n");
-        printf("                Высокая частота (например, 1.0 или 2.0): Цвет меняется очень быстро.\n");
-        printf("                Фрактал покроется множеством узких контрастных колец (эффект \"зебры\")\n");
+        printf("frequency    - Частота. Определяет, как быстро меняется цвет при переходе от одной итерации к другой.\n");
+        printf("               Низкая частота (например, 0.1): Цвет меняется медленно. Переходы будут широкими, плавными, \"растянутыми\".\n");
+        printf("               Высокая частота (например, 1.0 или 2.0): Цвет меняется очень быстро.\n");
+        printf("               Фрактал покроется множеством узких контрастных колец (эффект \"зебры\")\n");
+        printf("               По умолчанию 2.0\n");
         printf("phase_r      - Фазовый сдвиг красного. Определяет баланс цветов\n");
         printf("phase_g      - Фазовый сдвиг зелёного. Определяет баланс цветов\n");
         printf("phase_b      - Фазовый сдвиг синего. Определяет баланс цветов\n");
@@ -138,7 +128,7 @@ int main(int argc, char **argv) {
     printf("Начальный масштаб %0.3f\n", current_zoom);
     printf("Коэффициент приближения %0.3f\n", zoom_factor);
     /*
-    Координаты цели (Долина Морских Коньков)
+    Координаты цели (Долина Морских Коньков) Для степени 2
     double centerX = -0.743643887037158704752191506114774;
     double centerY = 0.131825904205311970493132056385139;
     */

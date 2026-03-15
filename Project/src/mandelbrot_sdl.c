@@ -47,9 +47,9 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels, doub
                 double mu = iter + 1 - ((log_05 + log(log(r2))) * inv_log2);
 
                 // Вычисляем компоненты напрямую
-                uint32_t r = (uint8_t)(sin(0.1 * mu + 0.0) * 127 + 128);
+                uint32_t r = (uint8_t)(sin(0.1 * mu + 5.0) * 127 + 128);
                 uint32_t g = (uint8_t)(sin(0.1 * mu + 2.0) * 127 + 128);
-                uint32_t b = (uint8_t)(sin(0.1 * mu + 4.0) * 127 + 128);
+                uint32_t b = (uint8_t)(sin(0.1 * mu + 2.0) * 127 + 128);
 
                 // Собираем в формат 0xRRGGBB
                 color = (r << 16) | (g << 8) | b;
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W, H);
     uint32_t *pixels = malloc(W * H * sizeof(uint32_t));
 
-    double zoom = 1.5, cx = -0.5, cy = 0;
+    double zoom = 3.0, cx = -0.7, cy = 0;
     int running = 1;
     SDL_Event e;
 
