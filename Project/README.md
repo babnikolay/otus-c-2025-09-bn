@@ -152,10 +152,10 @@ $ make mandelbrot_color
 $ make mandelbrot_color ARGS=3
 ```
 
-Если параметров несколько, то вводить их надо через пробел, например:  
+Если параметров несколько, то вводить их надо через пробел и в кавычках, например:  
 
 ```sh
-$ make mandelbrot_smooth ARGS=3.5 0.1 0.0 2.1 3.2
+$ make mandelbrot_smooth ARGS="3.5 0.1 0.0 2.1 3.2"
 ```
 
 ### Для сборки через __Cmake__ необходимо запустить скрипт __build_cmake.sh__:  
@@ -235,7 +235,7 @@ $ gcc -O3 mandelbrot_smooth.c -o mandelbrot_smooth -Wall -Wextra -Wpedantic -lm
 
 ```sh
 $ ./mandelbrot_smooth
-usage: ./mandelbrot_smooth degree frequency kr kg kb
+usage: ./mandelbrot_smooth degree frequency phase_r phase_g phase_b
 
 degree    - Степень уравнения Мандельброта: 2 или 3
 frequency - Частота. Определяет, как быстро меняется цвет при переходе от одной итерации к другой

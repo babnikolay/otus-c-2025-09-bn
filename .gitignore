@@ -26,6 +26,7 @@
 *.zip
 
 # Projects
+obj/
 Cursovaya/
 DZ_2_encoding/template/
 DZ_2_encoding/Archjpeg/zipjpeg_checker
@@ -41,9 +42,5 @@ DZ_27_drivers_system/lesson_test
 DZ_27_drivers_system/example
 DZ_27_drivers_system/simple_ring_buffer
 DZ_27_drivers_system/ring_buffer
-Project/mandel
-Project/mandel_anim
-Project/mandel_color
-Project/mandel_sdl
-Project/mandel_sdl_mouse
-Project/mandel_smooth
+Project/frames/
+Project/mandelbrot*
