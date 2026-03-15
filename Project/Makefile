@@ -69,6 +69,8 @@ $(notdir $(TARGETS)): %: $(BINDIR)/%
 	@printf "$(CYAN)[RUN]$(NC)  Запуск %s с аргументами: $(YELLOW)%s$(NC)...\n" "$<" "$(ARGS)"
 	@./$< $(ARGS)
 
+# Запрет make удалять .o файлы при ошибках
+.PRECIOUS: $(OBJDIR)/%.o
 
 # Специфичные настройки библиотек (должны быть ПЕРЕД правилом линковки)
 $(BINDIR)/mandelbrot_smooth: 	LDLIBS = -lm

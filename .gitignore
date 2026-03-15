@@ -27,6 +27,8 @@
 
 # Projects
 obj/
+dist/
+build/
 Cursovaya/
 DZ_2_encoding/template/
 DZ_2_encoding/Archjpeg/zipjpeg_checker
@@ -38,9 +40,12 @@ DZ_7_assembler/*.txt
 DZ_8_Unix_history/*.tar.gz
 DZ_9_Unix_program/*.zip
 DZ_26_tooling_for_linux_kernel/tracing
-DZ_27_drivers_system/lesson_test
-DZ_27_drivers_system/example
-DZ_27_drivers_system/simple_ring_buffer
-DZ_27_drivers_system/ring_buffer
+DZ_27_drivers_system/
+DZ_27_drivers_system/*
+# DZ_27_drivers_system/lesson_test
+# DZ_27_drivers_system/example
+# DZ_27_drivers_system/simple_ring_buffer
+# DZ_27_drivers_system/ring_buffer
 Project/frames/
-Project/mandelbrot*
+DZ_32_DB/
+Test/
