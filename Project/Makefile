@@ -65,6 +65,7 @@ mandelbrot_sdl:       ARGS = 1000 800
 mandelbrot_smooth:    ARGS = 3.5 0.1 0.0 2.1 3.2
 
 # Правила для сборки конкретных программ по имени (без пути)
+# Позволяет запускать 'make имя_программы' вместо 'make dist/bin/имя_программы'
 $(notdir $(TARGETS)): %: $(BINDIR)/%
 	@printf "$(CYAN)[RUN]$(NC)  Запуск %s с аргументами: $(YELLOW)%s$(NC)...\n" "$<" "$(ARGS)"
 	@./$< $(ARGS)

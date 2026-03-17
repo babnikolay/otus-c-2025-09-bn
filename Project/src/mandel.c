@@ -3,11 +3,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-Color palette[PALETTE_SIZE];
+// Color palette[PALETTE_SIZE];
 
 double zoom = 3.0, ca = -0.7, cb = 0.0;
 int max_iter = 1000, W = 800, H = 800;
-double R = 255.0, G = 170.0, B = 0.0;
+double R = 255.0, G = 150.0, B = 0.0;
 // double phase = 0.1; // Сдвиг всей палитры
 double degree = 2.0;
 
@@ -65,14 +65,14 @@ Color get_spectral_color (int iter, int max_iter, double modul, double degree, d
     double log_modul = log(modul);
     double mu = iter + 1 - ((log(log_modul) + log_05) * inv_log_degree);
 
-    // color.r = (unsigned char)(sin(freq * mu + R) * 127 + 128);
-    // color.g = (unsigned char)(sin(freq * mu + G) * 127 + 128); // 2.09 ≈ 2π/3
-    // color.b = (unsigned char)(sin(freq * mu + B) * 127 + 128); // 4.18 ≈ 4π/3
+    color.r = (unsigned char)(sin(freq * mu + R) * 127 + 128);
+    color.g = (unsigned char)(sin(freq * mu + G) * 127 + 128); // 2.09 ≈ 2π/3
+    color.b = (unsigned char)(sin(freq * mu + B) * 127 + 128); // 4.18 ≈ 4π/3
 
     // Более «ядовитые» и четкие цвета
-    color.r = (unsigned char)(pow(0.5 * cos(freq * mu + R) + 0.5, 2.0) * 255);
-    color.g = (unsigned char)(pow(0.5 * cos(freq * mu + G) + 0.5, 2.0) * 255);
-    color.b = (unsigned char)(pow(0.5 * cos(freq * mu + B) + 0.5, 2.0) * 255);
+    // color.r = (unsigned char)(pow(0.5 * cos(freq * mu + R) + 0.5, 2.0) * 255);
+    // color.g = (unsigned char)(pow(0.5 * cos(freq * mu + G) + 0.5, 2.0) * 255);
+    // color.b = (unsigned char)(pow(0.5 * cos(freq * mu + B) + 0.5, 2.0) * 255);
     
     return color;
 }
@@ -131,14 +131,14 @@ void get_input(const char *prompt, void *variable, const char *type, const char 
 uint32_t compute_pixel(int x, int y, int W, int H, double zoom, double ca, double cb, 
                           int max_iter, double R, double G, double B, double degree) {
     // Центрирование и масштабирование
-    double cx = ca + (x - W / 2.0) * (zoom / W);
-    double cy = cb + (y - H / 2.0) * (zoom / H);
+    double cx = ca + (x - (double)W / 2.0) * (zoom / (double)W);
+    double cy = cb + (y - (double)H / 2.0) * (zoom / (double)H);
     
     double zx = 0, zy = 0;
     int iter = 0;
     double r2 = 0;
 
-       while (r2 <= 16 && iter < max_iter) { // Радиус выхода 16 - лучше для высоких степеней
+    while (r2 <= 16 && iter < max_iter) { // Радиус выхода 16 - лучше для высоких степеней
         // Переход в полярные координаты
         double r = sqrt(zx * zx + zy * zy);
         double theta = atan2(zy, zx);
@@ -231,8 +231,8 @@ void save_png_with_dpi(double zoom, double ca, double cb, int iter, double R, do
 
     printf("Рендеринг %dx%d... ", w, h);
     fflush(stdout);
-
-#pragma omp parallel for schedule(dynamic)
+    // Директива OpenMP: разделяет итерации цикла по ядрам
+    #pragma omp parallel for schedule(dynamic)
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
             img[y * w + x] = compute_pixel(x, y, w, h, zoom, ca, cb, iter, R, G, B, degree);
@@ -301,7 +301,8 @@ void render(SDL_Renderer *ren, SDL_Texture *tex, uint32_t *pix, ...) {
     }
     va_end(args);
 
-#pragma omp parallel for schedule(dynamic)
+    // Директива OpenMP: разделяет итерации цикла по ядрам
+    #pragma omp parallel for schedule(dynamic)
     for (int y = 0; y < H; y++)
         for (int x = 0; x < W; x++)
             pix[y * W + x] = compute_pixel(x, y, W, H, zoom, ca, cb, max_iter, R, G, B, degree);
