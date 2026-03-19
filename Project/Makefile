@@ -4,7 +4,6 @@ INCDIR = include
 SRCDIR = src
 OBJDIR = obj
 BINDIR = dist/bin
-DIR = sdl_mouse
 
 # --- Проверка системных зависимостей ---
 PKGS := sdl2 pkg-config
@@ -14,7 +13,7 @@ CHECK_PKGS := $(shell pkg-config --exists $(PKGS) && echo yes || echo no)
 CHECK_OMP  := $(shell echo | $(CC) -fopenmp -x c -E - > /dev/null 2>&1 && echo yes || echo no)
 
 # Базовые флаги
-CFLAGS = -O3 -std=c11 -Wall -Wextra -Wpedantic -g -MMD -MP -I$(INCDIR)
+CFLAGS = -march=native -O3 -std=c11 -Wall -Wextra -Wpedantic -g -MMD -MP -I$(INCDIR)
 
 # Списки файлов
 PROG_SRCS   := $(wildcard $(SRCDIR)/mandelbrot*.c)
@@ -59,10 +58,15 @@ build_process:
 	fi
 
 # Дефолтные аргументы для каждой программы
-mandelbrot_anim:      ARGS = 2 1000 2.5 0.99 -1.768778833 -0.001738974 0.3 0.0 2.1 4.2
+mandelbrot_anim:      ARGS = 20 2.5 0.99 0.1 -0.694931644249973002 0.328768810689300195 255.0 150.0 0.0
+# -0.694931644249973002 0.328768810689300195
+# Долина кактусов
+# -1.361193711463937195 | Im: -0.070769140779782913
+# Долина Морских Коньков    
+# -0.743643887037158704752191506114774 0.131825904205311970493132056385139
 mandelbrot_color:     ARGS = 2
 mandelbrot_sdl:       ARGS = 1000 800
-mandelbrot_smooth:    ARGS = 3.5 0.1 0.0 2.1 3.2
+mandelbrot_smooth:    ARGS = 3.5 0.2 255.0 150.0 10.0
 
 # Правила для сборки конкретных программ по имени (без пути)
 # Позволяет запускать 'make имя_программы' вместо 'make dist/bin/имя_программы'
@@ -76,6 +80,8 @@ $(notdir $(TARGETS)): %: $(BINDIR)/%
 # Специфичные настройки библиотек (должны быть ПЕРЕД правилом линковки)
 $(BINDIR)/mandelbrot_smooth: 	LDLIBS = -lm
 $(BINDIR)/mandelbrot_anim:   	LDLIBS = -lm
+$(BINDIR)/mandelbrot_budda:     CFLAGS += -fopenmp
+$(BINDIR)/mandelbrot_budda:     LDLIBS = -lSDL2 -lm -fopenmp
 $(BINDIR)/mandelbrot_sdl:       CFLAGS += -fopenmp
 $(BINDIR)/mandelbrot_sdl:       LDLIBS = -lSDL2 -lm -fopenmp
 $(BINDIR)/mandelbrot_sdl_mouse: CFLAGS += -fopenmp
@@ -99,7 +105,7 @@ $(OBJDIR) $(BINDIR):
 clean:
 	@echo "$(RED)[RM]$(NC)  Очистка проекта (Makefile + CMake)..."
 	# 1. Удаляем папки Makefile
-	@rm -rf $(OBJDIR) $(BINDIR) $(DIR)
+	@rm -rf $(OBJDIR) $(BINDIR)
 	# 2. Удаляем стандартные папки установки и сборки CMake (если есть)
 	@rm -rf build/ dist/
 	# 3. Удаляем мусор, если CMake запускали прямо в корне (in-source build)

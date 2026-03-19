@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-// #include <complex.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -92,17 +91,17 @@ int main(int argc, char **argv) {
     printf("Фазовый сдвиг зелёного: %0.3f\n", phase_g);
     printf("Фазовый сдвиг синего: %0.3f\n", phase_b);
 
-    /*
-    Большой радиус для идеального сглаживания
-    Порог выхода (для d < 0 лучше брать больше)
-    */ 
-    double radius_escape = 100.0;
+    if (degree == 1.0 || degree == 0.0) {
+        fprintf(stderr, "Ошибка: степень не может быть 0 и не должна быть 1\n");
+        return 1;
+    }
+
     int width = 1000, height = 1000;
     int max_iter = 100;
     const int channels = 3; // RGB
 
     // Параметры камеры (можно менять в реальном времени)
-    double zoom = 4.0;     // Чем больше число, тем дальше камера (для d=0.5 и ниже должно быть порядка 10-20)
+    double zoom = 3.0;     // Чем больше число, тем дальше камера (для d=0.5 и ниже должно быть порядка 10-20)
     double offsetX = 0.0;  // Смещение по горизонтали
     double offsetY = 0.0;   // Смещение по вертикали (0 — центр)
 
@@ -113,14 +112,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char filename_png[60];
-    sprintf(filename_png, "mandelbrot_degree_%.5f_%.5f.png", degree, frequency);
-
-    
-
-    // Внутри цикла по x и y:
-    // double aspect_ratio = (double)width / height;
-
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             
@@ -129,7 +120,9 @@ int main(int argc, char **argv) {
                 offsetX = -0.75;
                 zoom = 3.0;
             }
-            else if (degree < 1.0) zoom = 10.0;
+            else if (degree < 1.0) 
+                    zoom = 10.0;
+
             // Центрирование и масштабирование
             double cx = offsetX + (x / (double)width - 0.5) * zoom;
             double cy = offsetY + (y / (double)height - 0.5) * zoom;
@@ -169,6 +162,9 @@ int main(int argc, char **argv) {
         }
     }
 
+    char filename_png[60];
+    sprintf(filename_png, "mandelbrot_degree_%.5f_%.5f.png", degree, frequency);
+    
     // Сохранение массива в PNG
     if (stbi_write_png(filename_png, width, height, channels, image_data, width * channels)) {
         printf("Фрактал успешно сохранен в %s\n", filename_png);

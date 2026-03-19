@@ -8,28 +8,28 @@
 #include <stdio.h>
 #include <time.h>
 
-void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels, double zoom, double cx, double cy, int W, int H)
+void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels, double zoom, double offsetX, double offsetY, int W, int H)
 {
     // Логарифмические константы - используется для оптимизации log(log(sqrt(z)))
     const double inv_log2 = 1.0 / log(2.0);
     const double log_05 = log(0.5);
 
-#pragma omp parallel for schedule(dynamic) // Многопоточность через библиотеку OMP
+    #pragma omp parallel for schedule(dynamic) // Многопоточность через библиотеку OMP
     for (int y = 0; y < H; y++)
     {
         for (int x = 0; x < W; x++)
         {
-            double ca = cx + (x - W / 2.0) * (zoom / W);
-            double cb = cy + (y - H / 2.0) * (zoom / W);
-            double a = 0, b = 0, a2 = 0, b2 = 0;
+            double cx = offsetX + (x - W / 2.0) * (zoom / W);
+            double cy = offsetY + (y - H / 2.0) * (zoom / W);
+            double zx =0, zy = 0;
             int iter = 0, max_iter = 128;
 
-            while (a2 + b2 <= 4 && iter < max_iter)
+            while (zx*zx + zy*zy <= 4 && iter < max_iter)
             {
-                b = 2 * a * b + cb;
-                a = a2 - b2 + ca;
-                a2 = a * a;
-                b2 = b * b;
+                double next_zx = zx * zx - zy * zy + cx;
+                zy = 2 * zx * zy + cy;
+                zx = next_zx;
+
                 iter++;
             }
 
@@ -37,19 +37,19 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture, uint32_t *pixels, doub
             if (iter < max_iter)
             {
                 /*
-                Вместо log(log(sqrt(a² + b²))) можно использовать свойства логарифмов, чтобы убрать корень:
+                Вместо log(log(sqrt(zx² + zy²))) можно использовать свойства логарифмов, чтобы убрать корень:
                 sqrt(z) = z^0.5
                 log(z^0.5) = 0.5 * log(z)
                 log(0.5 * log(z)) = log(0.5) + log(log(z))
                 */
-                double r2 = a * a + b * b; // Квадрат модуля
+                double r2 = zx * zx + zy * zy; // Квадрат модуля
                 // Вместо log(log(sqrt(r2))) / log(2)
                 double mu = iter + 1 - ((log_05 + log(log(r2))) * inv_log2);
 
                 // Вычисляем компоненты напрямую
-                uint32_t r = (uint8_t)(sin(0.1 * mu + 5.0) * 127 + 128);
-                uint32_t g = (uint8_t)(sin(0.1 * mu + 2.0) * 127 + 128);
-                uint32_t b = (uint8_t)(sin(0.1 * mu + 2.0) * 127 + 128);
+                uint32_t r = (uint8_t)(sin(0.1 * mu + 255.0) * 127 + 128);
+                uint32_t g = (uint8_t)(sin(0.1 * mu + 150.0) * 127 + 128);
+                uint32_t b = (uint8_t)(sin(0.1 * mu + 0.0) * 127 + 128);
 
                 // Собираем в формат 0xRRGGBB
                 color = (r << 16) | (g << 8) | b;
@@ -88,7 +88,7 @@ int main(int argc, char **argv)
     SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, W, H);
     uint32_t *pixels = malloc(W * H * sizeof(uint32_t));
 
-    double zoom = 3.0, cx = -0.7, cy = 0;
+    double zoom = 3.0, offsetX = -0.7, offsetY = 0;
     int running = 1;
     SDL_Event e;
 
@@ -103,16 +103,16 @@ int main(int argc, char **argv)
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_ESCAPE: running = 0; break;
-                case SDLK_UP: cy -= 0.1 * zoom; break;
-                case SDLK_DOWN: cy += 0.1 * zoom; break;
-                case SDLK_LEFT: cx -= 0.1 * zoom; break;
-                case SDLK_RIGHT: cx += 0.1 * zoom; break;
+                case SDLK_UP: offsetY -= 0.1 * zoom; break;
+                case SDLK_DOWN: offsetY += 0.1 * zoom; break;
+                case SDLK_LEFT: offsetX -= 0.1 * zoom; break;
+                case SDLK_RIGHT: offsetX += 0.1 * zoom; break;
                 case SDLK_EQUALS: zoom *= 0.8; break; // Клавиша +
                 case SDLK_MINUS: zoom *= 1.2; break; // Клавиша -
                 }
             }
         }
-        render(ren, tex, pixels, zoom, cx, cy, W, H);
+        render(ren, tex, pixels, zoom, offsetX, offsetY, W, H);
     }
 
     free(pixels);

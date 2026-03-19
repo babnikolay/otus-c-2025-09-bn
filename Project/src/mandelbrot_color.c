@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     int degree = atoi(argv[1]);
 
     if (degree != 2 && degree != 3) {
-        printf("Степень уравнения Мандельброта некорректная\n");
+        printf("Степень уравнения Мандельброта некорректная. Может быть только 2 или 3.\n");
         return 1;
     }
 
@@ -35,9 +35,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char filename_png[60];
-    sprintf(filename_png, "mandelbrot_degree_%d.png", degree);
-
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
 
@@ -45,8 +42,8 @@ int main(int argc, char **argv) {
             int iter = 0;
 
             if (degree == 2) {
-                double cx = -2.0 + (x / (double)width) * 2.5;
-                double cy = -1.25 + (y / (double)height) * 2.5;
+                double cx = -2.0 + ((double)x / (double)width) * 3.0;
+                double cy = -1.5 + ((double)y / (double)height) * 3.0;
 
                 // Вычисление следующих значений комплексного числа z по формуле: z(n+1) = z(n)^2 + c
                 while (zx * zx + zy * zy <= 4 && iter < max_iter)
@@ -58,8 +55,8 @@ int main(int argc, char **argv) {
                 }
             }
             else if (degree == 3) {
-                double cx = (x - (double)width / 2.0) * 4.0 / (double)width;
-                double cy = (y - (double)height / 2.0) * 4.0 / (double)height;
+                double cx = ((double)x - (double)width / 2.0) * 4.0 / (double)width;
+                double cy = ((double)y - (double)height / 2.0) * 4.0 / (double)height;
 
                 // Итерация z = z^3 + c
                 while (zx*zx + zy*zy <= 4.0 && iter <= max_iter) {
@@ -99,6 +96,9 @@ int main(int argc, char **argv) {
             image_data[index + 2] = b;
         }
     }
+
+    char filename_png[60];
+    sprintf(filename_png, "mandelbrot_degree_%d.png", degree);
 
     // Сохранение массива в PNG
     if (stbi_write_png(filename_png, width, height, channels, image_data, width * channels)) {

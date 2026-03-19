@@ -31,7 +31,7 @@ int main() {
             else if (iter > MAX_ITER / 10)
                 printf(".");
             else
-                printf(" ");
+                printf("-");
         }
         printf("\n");
     }
