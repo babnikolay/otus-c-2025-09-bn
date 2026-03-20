@@ -4,6 +4,9 @@
 *~
 *.log
 *.tar.gz
+*.png
+*.ppm
+*.mp4
 
 # Executable
 *.bin
