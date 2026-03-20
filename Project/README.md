@@ -569,3 +569,11 @@ B           - Синий для палитры. [0.0]
 а клик правой клавишей 'мыши' - отдаляет изображение. Изображение центрируется по нажатой точке.
 ======================================
 ```
+
+## Используемые материалы
+
+[Фрактальные типы](https://legalizeadulthood.github.io/iterated-dynamics/#_fractal_types)
+[WiKi с красивыми картинками и координатами красивых областей](https://ru.wikipedia.org/wiki/%D0%9C%D0%BD%D0%BE%D0%B6%D0%B5%D1%81%D1%82%D0%B2%D0%BE_%D0%9C%D0%B0%D0%BD%D0%B4%D0%B5%D0%BB%D1%8C%D0%B1%D1%80%D0%BE%D1%82%D0%B0)
+[Будда](https://en.wikipedia.org/wiki/Buddhabrot)
+[STB - библиотеки в одном файле](https://github.com/nothings/stb/tree/master)
+[Изображения множества Мандельброта](https://www.hpdz.net/StillImages/MandelbrotSet.htm)
