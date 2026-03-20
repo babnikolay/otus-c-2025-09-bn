@@ -16,7 +16,8 @@
 void help(char *prog_name) {
     printf("\n");
     printf("=============== ПОМОЩЬ ===============\n");
-    fprintf(stderr, "usage: %s degree frame_number zoom zoom_factor centerX centerY frequency phase_r phase_g phase_b\n", prog_name);
+    fprintf(stderr, "usage: %s <degree> <frame_number> <zoom> <zoom_factor> <centerX> <centerY> \
+            <frequency> <phase_r> <phase_g> <phase_b>\n", prog_name);
     printf("\n");
      printf("frame_number - Количество кадров для видео\n");
     printf("zoom         - Начальный масштаб, например, 2.5\n");
@@ -42,17 +43,6 @@ void generate_frame(int frame_num, double zoom, double frequency, double centerX
     const int width = 800, height = 800;
     const int max_iter = 1000;
 
-    // char filename[50];
-    // sprintf(filename, "frames/frame_%05d.ppm", frame_num);
-
-    // FILE *fp = fopen(filename, "wb");
-    // if (!fp) {
-    //     perror("Не удалось открыть файл");
-    //     return;
-    // }
-
-    // fprintf(fp, "P6\n%d %d\n255\n", width, height);
-
     // Выделяем память под массив пикселей для PNG
     unsigned char *pixels = (unsigned char *)malloc(width * height * 3);
     if (!pixels) {
@@ -64,8 +54,6 @@ void generate_frame(int frame_num, double zoom, double frequency, double centerX
         for (int x = 0; x < width; x++) {
             double cx = centerX + (x - (double)width / 2.0) * (zoom / (double)width);
             double cy = centerY + (y - (double)height / 2.0) * (zoom / (double)height);
-            // double cx = centerX + (x - (double)width / 3.0) * (zoom / (double)width);
-            // double cy = centerY + (y - (double)height / 3.0) * (zoom / (double)height);
 
             double zx = 0.0, zy = 0.0;
             int iter = 0;
@@ -77,7 +65,7 @@ void generate_frame(int frame_num, double zoom, double frequency, double centerX
                 iter++;
             }
 
-            unsigned char r = 255, g = 255, b = 255;
+            unsigned char r = 0, g = 0, b = 0;
 
             if (iter < max_iter) {
                 double r2 = zx * zx + zy * zy;
@@ -92,10 +80,6 @@ void generate_frame(int frame_num, double zoom, double frequency, double centerX
                 b = (unsigned char)(sin(frequency * mu + phase_b) * 127 + 128);
             }
 
-            // fputc(r, fp);
-            // fputc(g, fp);
-            // fputc(b, fp);
-
             int index = (y * width + x) * 3;
             pixels[index + 0] = (uint8_t)fminf(r, 255.0f);
             pixels[index + 1] = (uint8_t)fminf(g, 255.0f);
@@ -103,16 +87,14 @@ void generate_frame(int frame_num, double zoom, double frequency, double centerX
         }
     }
 
-    // fclose(fp);
-    // printf("Кадр %05d готов (zoom: %e)\n", frame_num, zoom);
-
     char filename_png[60];
     sprintf(filename_png, "frames/mandelbrot_%05d.png", frame_num);
 
     // Сохранение массива в PNG
     if (stbi_write_png(filename_png, width, height, 3, pixels, width * 3)) {
         // printf("Фрактал успешно сохранен в %s\n", filename_png);
-        printf("Кадр %05d готов (zoom: %e)\n", frame_num, zoom);
+        printf("\rКадр %05d готов (zoom: %e)", frame_num, zoom);
+        fflush(stdout);
     } else {
         printf("Ошибка при сохранении PNG.\n");
     }
@@ -188,7 +170,7 @@ int main(int argc, char **argv) {
 
     // 2. Фиксируем время окончания
     time_t end_time = time(NULL);
-    printf("Окончание: %s\n", ctime(&end_time));
+    printf("\nОкончание: %s\n", ctime(&end_time));
 
     // 3. Вычисляем разницу (длительность)
     double diff = difftime(end_time, start_time);

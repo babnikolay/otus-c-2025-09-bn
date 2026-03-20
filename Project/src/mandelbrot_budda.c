@@ -1,159 +1,186 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <math.h>
 #include <omp.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define WIDTH 800
-#define HEIGHT 800
-#define SAMPLES 40000000LL  // 40 млн для идеальной "графитовой" текстуры
+#define WIDTH 2400
+#define HEIGHT 2400
+#define SAMPLES 600000000 // 100 млн точек. Для идеального фона без шума ставьте 300-500 млн.
 
-// Разные лимиты итераций для каналов (R, G, B)
-#define ITER_R 50000
-#define ITER_G 5000
-#define ITER_B 500
+// Лимиты итераций для разделения каналов
+#define MAX_ITER 5000 
+#define THRESHOLD_RED   1000    // Долгоживущие точки -> Красный
+#define THRESHOLD_GREEN 100     // Средние -> Зеленый
+#define THRESHOLD_BLUE  20      // Быстрые -> Синий (Фон)
+#define MAX_ITER_DEEP 50000     // В 10 раз больше деталей
 
-void render_channel(int *current_channel, int *r_buf, int *g_buf, int *b_buf, int max_iter, int draw_bg) {
-    #pragma omp parallel
-    {
-        unsigned int seed = time(NULL) ^ omp_get_thread_num();
-        #pragma omp for
-        for (int s = 0; s < SAMPLES; s++) {
-            double cr = (double)rand_r(&seed) / RAND_MAX * 4.0 - 2.0;
-            double ci = (double)rand_r(&seed) / RAND_MAX * 4.0 - 2.0;
+const double X_MIN = -2.0, X_MAX = 1.0;
+const double Y_MIN = -1.5, Y_MAX = 1.5;
 
-            double zr = 0, zi = 0;
-            int escaped = 0;
-            for (int i = 0; i < max_iter; i++) {
-                double r2 = zr * zr, i2 = zi * zi;
-                if (r2 + i2 > 4.0) { escaped = 1; break; }
-                zi = 2.0 * zr * zi + ci;
-                zr = r2 - i2 + cr;
-            }
+double *r_plane, *g_plane, *b_plane, *d_plane;
 
-            if (escaped) {
-                // Цветная туманность (только в текущий канал)
-                zr = 0; zi = 0;
-                for (int i = 0; i < max_iter; i++) {
-                    double r2 = zr * zr, i2 = zi * zi;
-                    if (r2 + i2 > 4.0) break;
-                    zi = 2.0 * zr * zi + ci;
-                    zr = r2 - i2 + cr;
-                    int px = (int)((zr + 2.0) / 4.0 * WIDTH);
-                    int py = (int)((zi + 2.0) / 4.0 * HEIGHT);
-                    if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
-                        #pragma omp atomic
-                        current_channel[py * WIDTH + px]++;
-                    }
-                }
-            } else if (draw_bg) {
-                // СЕРЫЙ ФОН: записываем во ВСЕ каналы одинаково
-                int px = (int)((cr + 2.0) / 4.0 * WIDTH);
-                int py = (int)((ci + 2.0) / 4.0 * HEIGHT);
+// Оптимизация: пропуск точек внутри множества Мандельброта
+bool is_in_mandelbrot(double x, double y) {
+    double y2 = y * y;
+    double q = (x - 0.25) * (x - 0.25) + y2;
+    if (q * (q + (x - 0.25)) < 0.25 * y2) return true;
+    if ((x + 1.0) * (x + 1.0) + y2 < 0.0625) return true;
+    return false;
+}
 
-                if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
-                    int idx = py * WIDTH + px;
-                    #pragma omp atomic
-                    r_buf[idx] += 1; // Одинаковое значение для R, G, B даст серый
-                    #pragma omp atomic
-                    g_buf[idx] += 1;
-                    #pragma omp atomic
-                    b_buf[idx] += 3;
-                }
-            }
+// Функция отрисовки траектории в конкретный массив
+void trace_to_plane(double cr, double ci, int age, double *plane) {
+    double zr = 0, zi = 0;
+    for (int i = 0; i < age; i++) {
+        double zr2 = zr * zr, zi2 = zi * zi;
+        double zi_next = 2.0 * zr * zi + ci;
+        zr = zr2 - zi2 + cr;
+        zi = zi_next;
+
+        // Поворот на 90 градусов (вертикальный вид)
+        int px = (int)((zi - Y_MIN) / (Y_MAX - Y_MIN) * WIDTH);
+        int py = (int)((zr - X_MIN) / (X_MAX - X_MIN) * HEIGHT);
+
+        if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
+            #pragma omp atomic
+            plane[py * WIDTH + px]++;
         }
     }
 }
-
-int main() {
-    // 1. Фиксируем время начала
+int main(int argc, char **argv) {
+    // Фиксируем время начала
     time_t start_time = time(NULL);
     printf("Начало: %s\n", ctime(&start_time));
 
-    int *red = calloc(WIDTH * HEIGHT, sizeof(int));
-    int *green = calloc(WIDTH * HEIGHT, sizeof(int));
-    int *blue = calloc(WIDTH * HEIGHT, sizeof(int));
+    if (argc != 4) {
+        printf("Использование: %s <k_r> <k_g> <k_b> <k_d>\n", argv[0]);
+        printf("Пример: %s 0.8 0.7 0.5 0.6\n", argv[0]);
 
-    double start, end;
+        // Фиксируем время окончания
+        time_t end_time = time(NULL);
+        printf("Окончание: %s\n", ctime(&end_time));
 
-    printf("Rendering R (long paths)...\n");
-    start = omp_get_wtime();
-    // Третий аргумент (1) означает, что при расчете Red мы также рисуем серый силуэт
-    render_channel(red, red, green, blue, ITER_R, 1);
-    end = omp_get_wtime();
-    printf("R channel done in %.2f seconds.\n", end - start);
+        // Вычисляем разницу (длительность)
+        double diff = difftime(end_time, start_time);
+        printf("Программа работала %.0f сек.\n", diff);
 
-    printf("Rendering G (medium paths)...\n");
-    start = omp_get_wtime();
-    
-    render_channel(green, red, green, blue, ITER_G, 0); 
-    end = omp_get_wtime();
-    printf("G channel done in %.2f seconds.\n", end - start);
-
-    printf("Rendering B (short paths)...\n");
-    start = omp_get_wtime();
-    render_channel(blue, red, green, blue, ITER_B, 0);
-    end = omp_get_wtime();
-    printf("B channel done in %.2f seconds.\n", end - start);
-
-    // Сохраняем в формат PNG
-    const int channels = 3; // RGB
-
-    // Выделяем память под массив пикселей для PNG
-    unsigned char *pixels = (unsigned char *)malloc(WIDTH * HEIGHT * channels);
-    if (!pixels) {
-        fprintf(stderr, "Ошибка выделения памяти\n");
         return 1;
     }
 
-    // Подбор делителя для яркости (можно покрутить 100 на 50 или 200)
-    // double exposure = SAMPLES / 100.0;
+    double k_r = atof(argv[1]);
+    double k_g = atof(argv[2]);
+    double k_b = atof(argv[3]);
+    printf("Коэффициент индивидуальной гаммы для сочности k_r = %.3f\n", k_r);
+    printf("Коэффициент индивидуальной гаммы для сочности k_g = %.3f\n", k_g);
+    printf("Коэффициент индивидуальной гаммы для сочности k_b = %.3f\n", k_b);
 
-    // Находим максимум для каждого канала (упрощенно)
-    // В идеале нужно найти max отдельно для R, G и B для баланса белого
+    r_plane = (double*)calloc(WIDTH * HEIGHT, sizeof(double));
+    g_plane = (double*)calloc(WIDTH * HEIGHT, sizeof(double));
+    b_plane = (double*)calloc(WIDTH * HEIGHT, sizeof(double));
+
+    long long progress = 0;
+    printf("\nГенерация радужного Будды на %d потоках...\n", omp_get_max_threads());
+
+    #pragma omp parallel
+    {
+        unsigned int seed = time(NULL) ^ omp_get_thread_num();
+        #pragma omp for schedule(dynamic, 5000)
+        for (long i = 0; i < SAMPLES; i++) {
+            if (i % 10000000 == 0) {
+                #pragma omp atomic
+                progress += 10000000;
+                if (omp_get_thread_num() == 0) {
+                    printf("\rПрогресс: %.2f%% ", (double)progress / SAMPLES * 100.0);
+                    fflush(stdout);
+                }
+            }
+
+            double cr = ((double)rand_r(&seed)/RAND_MAX) * (X_MAX-X_MIN) + X_MIN;
+            double ci = ((double)rand_r(&seed)/RAND_MAX) * (Y_MAX-Y_MIN) + Y_MIN;
+
+            if (is_in_mandelbrot(cr, ci)) continue;
+
+            // Узнаем, когда точка убежит
+            double zr = 0, zi = 0;
+            int age = 0;
+            while (zr*zr + zi*zi < 4.0 && age < MAX_ITER) {
+                double zr_new = zr*zr - zi*zi + cr;
+                zi = 2.0*zr*zi + ci;
+                zr = zr_new;
+                age++;
+            }
+
+            // Если точка убежала, рисуем её в ОДИН из каналов (изоляция цвета)
+            if (age < MAX_ITER) {
+                if (age > THRESHOLD_RED)        trace_to_plane(cr, ci, age, r_plane);
+                else if (age > THRESHOLD_GREEN) trace_to_plane(cr, ci, age, g_plane);
+                else if (age > THRESHOLD_BLUE)  trace_to_plane(cr, ci, age, b_plane);
+            }
+        }
+    }
+
+    double max_r = 0, max_g = 0, max_b = 0;
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        // Логарифмическое масштабирование и запись RGB байтов
-        // unsigned char r = (unsigned char)(255 * log1p(red[i]) / log1p(exposure)); // Примерный делитель
-        // unsigned char g = (unsigned char)(255 * log1p(green[i]) / log1p(exposure));
-        // unsigned char b = (unsigned char)(255 * log1p(blue[i]) / log1p(exposure));
+        if (r_plane[i] > max_r) max_r = r_plane[i];
+        if (g_plane[i] > max_g) max_g = g_plane[i];
+        if (b_plane[i] > max_b) max_b = b_plane[i];
+    }
 
+    // Подготовка данных для PNG (3 байта на пиксель)
+    unsigned char* image_data = (unsigned char*)malloc(WIDTH * HEIGHT * 3);
+
+    for (int i = 0; i < WIDTH * HEIGHT; i++) {
         /*
-        Логарифмическая яркость (коэффициент 12.0 - 15.0 для графита)
-        Коэффициент 0.6 подтянет тени, делая графит видимым, но не серым
+        Логарифмическое масштабирование с индивидуальной гаммой для сочности
+        r=0.8, g=0.7, b=0.5 - голубой фон с белым Буддой
+        0.6, 0.75, 0.45 - розоватый Будда
+        Нормализуем значения (v_r, v_g, v_b — это log-значения от 0.0 до 1.0)
         */
-        float k = 15.0f;
-        // Применяем log1p для сжатия динамического диапазона (ln(1 + x))
-        float r = log1pf((float)red[i])   * k;
-        float g = log1pf((float)green[i]) * k;
-        float b = log1pf((float)blue[i])  * k;
+        double v_r = log1p(r_plane[i]) / log1p(max_r);
+        double v_g = log1p(g_plane[i]) / log1p(max_g);
+        double v_b = log1p(b_plane[i]) / log1p(max_b);
 
-        // pixels[i * 3 + 0] = r;
-        // pixels[i * 3 + 1] = g;
-        // pixels[i * 3 + 2] = b;
+        double r = pow(v_r, k_r);
+        double g = pow(v_g, k_g);
+        double b = pow(v_b, k_b); // Низкая гамма для яркого фона
 
-        // Ограничение и запись в массив пикселей
-        pixels[i * 3 + 0] = (uint8_t)fminf(r, 255.0f);
-        pixels[i * 3 + 1] = (uint8_t)fminf(g, 255.0f);
-        pixels[i * 3 + 2] = (uint8_t)fminf(b, 255.0f);
+        // Contrast Stretch (делаем тени "шоколадными", а свет "горящим")
+        r = (r > 0.1) ? pow(r, 1.1) : r * 0.8;
+
+        // Смешиваем каналы для переливов (малиновый верх, бирюзовые бока)
+        // int R = (int)((r * 1.0 + b * 0.1) * 255);
+        // int G = (int)((g * 1.0 + r * 0.1) * 255);
+        // int B = (int)((b * 1.0 + g * 0.2) * 255);
+
+        // Смешивание каналов для ЗОЛОТА:
+        // R = основа (красно-оранжевый)
+        // G = придает желтизну (примерно 80-85% от R)
+        // B = придает блеск и уводит желтый в "дорогой" лимонный, а не в рыжий
+        int R = (int)((r * 1.0 + b * 0.1) * 255);
+        int G = (int)((g * 0.85 + r * 0.1) * 255); // Основной золотой тон
+        int B = (int)((b * 0.5 + g * 0.2) * 255);  // Синий подмешиваем чуть-чуть для ярко-желтых бликов
+
+        // Ограничители (clamping)
+        if (R > 255) R = 255;
+        if (G > 255) G = 255;
+        if (B > 255) B = 255;
+        if (R > 140) B += (R - 140) * 0.5;
+
+        image_data[i * 3 + 0] = R > 255 ? 255 : R;
+        image_data[i * 3 + 1] = G > 255 ? 255 : G;
+        image_data[i * 3 + 2] = B > 255 ? 255 : B;
     }
 
-    char filename_png[60];
-    sprintf(filename_png, "mandelbrot_budda.png");
+    stbi_write_png("buddhabrot.png", WIDTH, HEIGHT, 3, image_data, WIDTH * 3);
 
-    // Сохранение массива в PNG
-    if (stbi_write_png(filename_png, WIDTH, HEIGHT, channels, pixels, WIDTH * channels)) {
-        printf("Фрактал успешно сохранен в %s\n", filename_png);
-    } else {
-        printf("Ошибка при сохранении PNG\n");
-    }
+    printf("\nГотово! Результат в buddhabrot.png\n\n");
+    free(r_plane); free(g_plane); free(b_plane);
 
-    free(pixels);
-    free(red); free(green); free(blue);
-    
     // 2. Фиксируем время окончания
     time_t end_time = time(NULL);
     printf("Окончание: %s\n", ctime(&end_time));
