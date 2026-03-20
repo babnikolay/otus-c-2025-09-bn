@@ -40,7 +40,8 @@ foreach(prog_path ${PROG_SRCS})
     get_filename_component(prog_name ${prog_path} NAME_WE)
     
     add_executable(${prog_name} ${prog_path} ${COMMON_SRCS})
-    target_link_libraries(${prog_name} PRIVATE m)
+    # Добавляем OpenMP сюда, чтобы он был у всех программ:
+    target_link_libraries(${prog_name} PRIVATE m OpenMP::OpenMP_C)
     
     if(prog_name STREQUAL "mandelbrot_sdl_mouse")
         target_sources(${prog_name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/mandel.c")
