@@ -22,6 +22,7 @@
     - [Как сделать видео](#как-сделать-видео)
   - [6. mandelbrot_sdl.c](#6.-mandelbrot_sdl.c)
   - [7. mandelbrot_sdl_mouse.c](#7.-mandelbrot_sdl_mouse.c)
+  - [8. mandelbrot_budda.c](8.-mandelbrot_budda.c)
 
 
 ## Описание  
