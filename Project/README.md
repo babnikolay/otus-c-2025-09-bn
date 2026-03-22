@@ -577,12 +577,6 @@ B           - Синий для палитры. [0.0]
 
 Программа вычисляет и выводит в PNG файл множество Мандельброта - Будда.
 
-![Рисунок 6](Pictures/buddhabrot_golden.png)  
-
-![Рисунок 7](Pictures/buddhabrot_golden_blue.png)  
-
-![Рисунок 8](Pictures/buddhabrot_white.png)  
-
 ```sh
 $ gcc -O3 mandelbrot_budda.c -o mandelbrot_budda -Wall -Wextra -Wpedantic -lSDL2 -lm -fopenmp
 ```
@@ -596,9 +590,19 @@ $ ./mandelbrot_budda 0.9 1.2 0.3
 При запуске программы без параметров, она выдаст сообщение, как правильно её запускать: 
 
 ```sh
-Использование: ./mandelbrot_budda <k_r> <k_g> <k_b> <k_d>
-Пример: ./mandelbrot_budda 0.8 0.7 0.5 0.6
+Использование: ./mandelbrot_budda k_r k_g k_b
+R   - Красный для палитры. [0.8]
+G   - Зелёный для палитры. [1.2]
+B   - Синий для палитры. [0.4]
+Пример: ./dist/bin/mandelbrot_budda 0.8 0.7 0.5
+
 ```
+
+![Рисунок 6](Pictures/buddhabrot_golden.png)  
+
+![Рисунок 7](Pictures/buddhabrot_golden_blue.png)  
+
+![Рисунок 8](Pictures/buddhabrot_white.png) 
 
 
 ## Используемые материалы

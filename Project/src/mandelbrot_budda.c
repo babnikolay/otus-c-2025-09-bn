@@ -58,8 +58,11 @@ int main(int argc, char **argv) {
     printf("Начало: %s\n", ctime(&start_time));
 
     if (argc != 4) {
-        printf("Использование: %s <k_r> <k_g> <k_b> <k_d>\n", argv[0]);
-        printf("Пример: %s 0.8 0.7 0.5 0.6\n", argv[0]);
+        printf("Использование: %s k_r k_g k_b\n", argv[0]);
+        printf("R   - Красный для палитры. [0.8]\n");
+        printf("G   - Зелёный для палитры. [1.2]\n");
+        printf("B   - Синий для палитры. [0.4]\n");
+        printf("Пример: %s 0.8 0.7 0.5\n", argv[0]);
 
         // Фиксируем время окончания
         time_t end_time = time(NULL);

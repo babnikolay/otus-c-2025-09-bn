@@ -67,7 +67,7 @@ mandelbrot_anim:   	ARGS = 2000 2.5 0.99 0.1 -0.694931644249973002 0.32876881068
 mandelbrot_color:	ARGS = 2
 mandelbrot_sdl:     ARGS = 1000 800
 mandelbrot_smooth:  ARGS = 3.5 0.2 255.0 150.0 10.0
-mandelbrot_budda:   ARGS = 0.8 1.2 0.2
+mandelbrot_budda:   ARGS = 0.8 1.2 0.4
 
 # Правила для сборки конкретных программ по имени (без пути)
 # Позволяет запускать 'make имя_программы' вместо 'make dist/bin/имя_программы'
