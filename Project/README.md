@@ -497,7 +497,7 @@ $ ffmpeg -i input.mp4 -vcodec libx264 -crf 28 -preset faster -maxrate 1M -bufsiz
 
 Видео фрактала Мандельброа в одной из точек:
 
-[![Video](Pictures/output.jpg](https://github.com/babnikolay/otus-c-2025-09-bn/blob/main/Project/Pictures/output.mp4)
+<video src="https://github.com/user-attachments/assets/daaddb38-dfc3-450a-8138-3028668d591f" width="100%" controls></video>
 
 
 ### 6. mandelbrot_sdl.c  
