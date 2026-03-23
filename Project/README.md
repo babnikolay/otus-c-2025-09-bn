@@ -495,7 +495,9 @@ $ ffmpeg -i input.mp4 -vcodec libx264 -crf 28 -preset faster -maxrate 1M -bufsiz
 - crf 28: регулирует качество (чем выше число, тем меньше файл, обычно 23–28 — баланс).  
 - vcodec libx264: самый совместимый формат для браузеров.  
 
-<video src="https://github.com/babnikolay/otus-c-2025-09-bn/blob/main/Project/Pictures/output.mp4?raw=true" width="100%" controls></video>
+Видео фрактала Мандельброа в одной из точек:
+
+[![Video](Pictures/output.jpg](Pictures/output.mp4)
 
 
 ### 6. mandelbrot_sdl.c  
