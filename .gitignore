@@ -37,9 +37,6 @@ DZ_2_encoding/template/
 DZ_2_encoding/Archjpeg/zipjpeg_checker
 DZ_2_encoding/Converter/converter
 DZ_6_libs/weather_cjson
-# DZ_7_assembler/main
-# DZ_7_assembler/asm_prog
-# DZ_7_assembler/*.txt
 DZ_8_Unix_history/*.tar.gz
 DZ_9_Unix_program/*.zip
 DZ_26_tooling_for_linux_kernel/
