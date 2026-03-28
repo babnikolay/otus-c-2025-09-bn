@@ -21,8 +21,8 @@ Kernel hacking - Tracers
 5. Собираем и устанавливаем ядро:
 ```
 $ make -j2
-$ make modeles
-$ sudo make modeles_install
+$ make modules
+$ sudo make modules_install
 $ sudo make install
 ```
 
