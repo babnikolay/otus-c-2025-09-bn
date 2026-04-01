@@ -26,23 +26,14 @@
 *.jar
 *.rar
 *.tar
-*.zip
+# *.zip
 
 # Projects
 obj/
 dist/
 build/
 Cursovaya/
-# DZ_2_encoding/template/
-# DZ_2_encoding/Archjpeg/zipjpeg_checker
-# DZ_2_encoding/Converter/converter
-# DZ_6_libs/weather_cjson
-# DZ_8_Unix_history/*.tar.gz
 # DZ_9_Unix_program/*.zip
-DZ_9_Unix_program/clib_new/
-DZ_9_Unix_program/clib/*
-# DZ_26_tooling_for_linux_kernel/
-# Project/frames/
 Project/
 DZ_32_DB/
 Test/
