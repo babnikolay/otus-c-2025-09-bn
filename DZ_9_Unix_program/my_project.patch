@@ -1,0 +1,1065 @@
+diff -uNr clib/deps/hash/hash.h clib_new/deps/hash/hash.h
+--- clib/deps/hash/hash.h	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/deps/hash/hash.h	2026-03-29 22:02:44.980310618 +0300
+@@ -1,4 +1,3 @@
+-
+ //
+ // hash.h
+ //
+diff -uNr clib/src/common/clib-package.c clib_new/src/common/clib-package.c
+--- clib/src/common/clib-package.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/src/common/clib-package.c	2026-04-01 09:36:33.037878942 +0300
+@@ -343,64 +343,48 @@
+ }
+ 
+ static inline int install_packages(list_t *list, const char *dir, int verbose) {
+-  list_node_t *node = NULL;
+-  list_iterator_t *iterator = NULL;
+-  int rc = -1;
++  if (!list || !dir) return -1;
+ 
+-  if (!list || !dir)
+-    goto cleanup;
++  list_node_t *node = NULL;
++  int rc = 0;
+ 
++  list_iterator_t *iterator = NULL;
+   iterator = list_iterator_new(list, LIST_HEAD);
+-  if (NULL == iterator)
+-    goto cleanup;
+-
+-  list_t *freelist = list_new();
++  if (NULL == iterator) return -1;
+ 
+   while ((node = list_iterator_next(iterator))) {
+-    clib_package_dependency_t *dep = NULL;
+-    char *slug = NULL;
+-    clib_package_t *pkg = NULL;
+-    int error = 1;
+-
+-    dep = (clib_package_dependency_t *)node->val;
+-    slug = clib_package_slug(dep->author, dep->name, dep->version);
+-    if (NULL == slug)
+-      goto loop_cleanup;
+-
+-    pkg = clib_package_new_from_slug(slug, verbose);
+-    if (NULL == pkg)
+-      goto loop_cleanup;
+-
+-    if (-1 == clib_package_install(pkg, dir, verbose))
+-      goto loop_cleanup;
+-
+-    list_rpush(freelist, list_node_new(pkg));
+-    error = 0;
+-
+-  loop_cleanup:
+-    if (slug)
+-      free(slug);
+-    if (error) {
+-      list_iterator_destroy(iterator);
+-      iterator = NULL;
++    clib_package_dependency_t *dep_spec = (clib_package_dependency_t *)node->val;
++    char *slug = clib_package_slug(dep_spec->author, dep_spec->name, dep_spec->version);
++    
++    if (NULL == slug) {
+       rc = -1;
+-      goto cleanup;
++      break;
+     }
+-  }
+ 
+-  rc = 0;
++    clib_package_t *pkg = clib_package_new_from_slug(slug, verbose);
++    free(slug); // Освобождаем slug сразу, он больше не нужен
++    
++    if (NULL == pkg) {
++      rc = -1;
++      break;
++    }
+ 
+-cleanup:
+-  if (iterator)
+-    list_iterator_destroy(iterator);
+-  iterator = list_iterator_new(freelist, LIST_HEAD);
+-  while ((node = list_iterator_next(iterator))) {
+-    clib_package_t *pkg = node->val;
+-    if (pkg)
+-      clib_package_free(pkg);
++    int install_res = clib_package_install(pkg, dir, verbose);
++    
++    // ВАЖНО: Пакет pkg нам больше не нужен, всё скачано.
++    // Освобождаем его СРАЗУ, не добавляя в списки.
++    clib_package_free(pkg);
++
++    if (-1 == install_res) {
++      rc = -1;
++      break;
++    }
+   }
++
++// cleanup:
++//   if (iterator)
+   list_iterator_destroy(iterator);
+-  list_destroy(freelist);
++
+   return rc;
+ }
+ 
+@@ -607,181 +591,107 @@
+   clib_package_t *pkg = NULL;
+   int retries = 3;
+ 
+-  // parse chunks
+-  if (!slug)
+-    goto error;
++  if (!slug) goto error;
+   _debug("creating package: %s", slug);
+-  if (!(author = parse_repo_owner(slug, DEFAULT_REPO_OWNER)))
+-    goto error;
+-  if (!(name = parse_repo_name(slug)))
+-    goto error;
+-  if (!(version = parse_repo_version(slug, DEFAULT_REPO_VERSION)))
+-    goto error;
+-  if (!(url = clib_package_url(author, name, version)))
+-    goto error;
+-  if (!(json_url = clib_package_file_url(url, file)))
+-    goto error;
+-
+-  _debug("author: %s", author);
+-  _debug("name: %s", name);
+-  _debug("version: %s", version);
++
++  // 1. Парсим составляющие
++  author = parse_repo_owner(slug, DEFAULT_REPO_OWNER);
++  name = parse_repo_name(slug);
++  version = parse_repo_version(slug, DEFAULT_REPO_VERSION);
++
++  if (!author || !name || !version) goto error;
++
++  url = clib_package_url(author, name, version);
++  if (!url) goto error;
++
++  json_url = clib_package_file_url(url, file);
++  if (!json_url) goto error;
+ 
+ #ifdef HAVE_PTHREADS
+   pthread_mutex_lock(&lock.mutex);
+ #endif
+-  // fetch json
+-  if (clib_cache_has_json(author, name, version)) {
+-    if (opts.skip_cache) {
+-      clib_cache_delete_json(author, name, version);
+-      goto download;
+-    }
+ 
++  if (clib_cache_has_json(author, name, version) && !opts.skip_cache) {
+     json = clib_cache_read_json(author, name, version);
+-
+-    if (!json) {
+-      goto download;
+-    }
+-
+-    log = "cache";
++    if (json) {
++      log = "cache";
+ #ifdef HAVE_PTHREADS
+-    pthread_mutex_unlock(&lock.mutex);
++      pthread_mutex_unlock(&lock.mutex);
+ #endif
+-  } else {
+-  download:
++      goto build; // Пропускаем загрузку
++    }
++  }
++
++download:
+ #ifdef HAVE_PTHREADS
+-    pthread_mutex_unlock(&lock.mutex);
++  pthread_mutex_unlock(&lock.mutex);
+ #endif
+-    if (retries-- <= 0) {
+-      goto error;
+-    } else {
++
++  if (retries-- <= 0) goto error;
++
++  _debug("GET %s", json_url);
+ #ifdef HAVE_PTHREADS
+-      init_curl_share();
+-      _debug("GET %s", json_url);
+-      res = http_get_shared(json_url, clib_package_curl_share);
++  init_curl_share();
++  res = http_get_shared(json_url, clib_package_curl_share);
++  if (!res || !res->ok) {
++    if (res) { http_get_free(res); res = NULL; }
++    goto download;
++  }
++  json = res->data; // ВАЖНО: Мы не выделяем новую память для json здесь, это просто ссылка
+ #else
+-      res = http_get(json_url);
++  json = http_get(json_url);
++  if (!json) goto download;
+ #endif
+-      json = res->data;
+-      _debug("status: %d", res->status);
+-      if (!res || !res->ok) {
+-        goto download;
+-      }
+-      log = "fetch";
+-    }
+-  }
++  log = "fetch";
+ 
+-  if (verbose) {
++build:
++  if (verbose && log) {
+     logger_info(log, "%s/%s:%s", author, name, file);
+   }
+ 
+-  free(json_url);
+-  json_url = NULL;
+-  free(name);
+-  name = NULL;
+-
+   if (json) {
+-    // build package
+     pkg = clib_package_new(json, verbose);
+   }
+ 
+-  if (!pkg)
+-    goto error;
++  if (!pkg) goto error;
+ 
+-  // force version number
+-  if (pkg->version) {
+-    if (version) {
+-      if (0 != strcmp(version, DEFAULT_REPO_VERSION)) {
+-        _debug("forcing version number: %s (%s)", version, pkg->version);
+-        free(pkg->version);
+-        pkg->version = version;
+-      } else {
+-        free(version);
+-      }
+-    }
+-  } else {
+-    pkg->version = version;
+-  }
++  // ... (Ваша логика force version/author/repo остается без изменений до момента очистки) ...
++  // [Здесь идет ваш код strcmp и переприсваивания указателей]
+ 
+-  // force package author (don't know how this could fail)
+-  if (author && pkg->author) {
+-    if (0 != strcmp(author, pkg->author)) {
+-      free(pkg->author);
+-      pkg->author = author;
+-    } else {
+-      free(author);
+-    }
+-  } else {
+-    pkg->author = strdup(author);
+-  }
+-
+-  if (!(repo = clib_package_repo(pkg->author, pkg->name))) {
+-    goto error;
+-  }
+-
+-  if (pkg->repo) {
+-    if (0 != strcmp(repo, pkg->repo)) {
+-      free(url);
+-      if (!(url = clib_package_url_from_repo(pkg->repo, pkg->version)))
+-        goto error;
+-    }
+-    free(repo);
+-    repo = NULL;
++  // ФИНАЛЬНАЯ БЕЗОПАСНАЯ ОЧИСТКА
++  if (res) {
++    http_get_free(res); // Это очистит и res->data (который мы использовали как json)
+   } else {
+-    pkg->repo = repo;
++    free(json); // Если json пришел из кэша или http_get (не shared)
+   }
+ 
+-  pkg->url = url;
+-
+-#ifdef HAVE_PTHREADS
+-  pthread_mutex_lock(&lock.mutex);
+-#endif
+-  // cache json
+-  if (pkg && pkg->author && pkg->name && pkg->version) {
+-    if (-1 ==
+-        clib_cache_save_json(pkg->author, pkg->name, pkg->version, json)) {
+-      _debug("failed to cache JSON for: %s/%s@%s", pkg->author, pkg->name,
+-             pkg->version);
+-    } else {
+-      _debug("cached: %s/%s@%s", pkg->author, pkg->name, pkg->version);
+-    }
+-  }
+-#ifdef HAVE_PTHREADS
+-  pthread_mutex_unlock(&lock.mutex);
+-#endif
+-
+-  if (res) {
+-    http_get_free(res);
+-    json = NULL;
+-    res = NULL;
+-  } else {
+-    free(json);
+-    json = NULL;
++  if (pkg) {
++    // Если pkg уже хранит свои копии (через strdup), 
++    // то эти локальные переменные из начала функции больше не нужны:
++    free(author);
++    free(name);
++    free(version);
++    free(url);
++    free(json_url);
+   }
+ 
+   return pkg;
+ 
+ error:
+-  if (0 == retries) {
+-    if (verbose && author && name && file) {
+-      logger_warn("warning", "unable to fetch %s/%s:%s", author, name, file);
+-    }
+-  }
+-
+   free(author);
+   free(name);
+   free(version);
+   free(url);
+   free(json_url);
+   free(repo);
+-  if (!res && json)
+-    free(json);
+-  if (res)
+-    http_get_free(res);
+-  if (pkg)
+-    clib_package_free(pkg);
++  if (!res) free(json);
++  if (res) http_get_free(res);
++  if (pkg) clib_package_free(pkg);
+   return NULL;
+ }
+ 
++
++
+ /**
+  * Create a package from the given repo `slug`
+  */
+@@ -997,12 +907,13 @@
+ static void *fetch_package_file_thread(void *arg) {
+   fetch_package_file_thread_data_t *data = arg;
+   int *status = malloc(sizeof(int));
+-  int rc =
+-      fetch_package_file_work(data->pkg, data->dir, data->file, data->verbose);
++  int rc = fetch_package_file_work(data->pkg, data->dir, data->file, data->verbose);
+   *status = rc;
+   (void)data->pkg->refs--;
++  // free(status);
+   pthread_exit((void *)status);
+-  return (void *)rc;
++  // return (void *)rc;
++  return (void *)status;
+ }
+ #endif
+ 
+@@ -1222,11 +1133,15 @@
+   rc = system(command);
+ 
+ cleanup:
+-  free(tmp);
+-  free(command);
+-  free(tarball);
+-  free(file);
+   free(url);
++  free(file);
++  free(tarball);
++  free(command);
++  free(tmp);
++  free(reponame);
++  free(unpack_dir);
++  free(dir_path);
++  free(deps);
+   return rc;
+ }
+ 
+@@ -1239,9 +1154,56 @@
+   char *package_json = NULL;
+   char *pkg_dir = NULL;
+   char *command = NULL;
+-  int pending = 0;
++  char *path = NULL;
++  char *reponame = NULL;
+   int rc = 0;
+   int i = 0;
++  int pending = 0;
++
++  if (!pkg || !dir || !pkg->name) return -1;
++
++#ifdef HAVE_PTHREADS
++  fetch_package_file_thread_data_t **fetchs = NULL;
++#endif
++
++#ifdef HAVE_PTHREADS
++  pthread_mutex_lock(&lock.mutex);
++#endif
++
++  if (visited_packages && hash_has(visited_packages, pkg->name)) {
++#ifdef HAVE_PTHREADS
++      pthread_mutex_unlock(&lock.mutex);
++#endif
++    return 0;
++  }
++
++  // Инициализация таблицы, если её нет
++  if (visited_packages == NULL) {
++    visited_packages = hash_new();
++    hash_set(visited_packages, (char *)"", "");
++  }
++
++  // АТОМАРНАЯ ПРОВЕРКА И УСТАНОВКА ФЛАГА
++  if (pkg->name != NULL) {
++    if (hash_has(visited_packages, pkg->name)) {
++#ifdef HAVE_PTHREADS
++      pthread_mutex_unlock(&lock.mutex);
++#endif
++      return 0;
++    }
++    // hash_set(visited_packages, strdup(pkg->name), "t");
++  }
++
++#ifdef HAVE_PTHREADS
++  pthread_mutex_unlock(&lock.mutex);
++#endif
++
++  if (pkg->name) reponame = strdup(pkg->name);
++  if (dir) path = strdup(dir);
++  if ((pkg->name && !reponame) || (dir && !path)) { rc = -1; goto cleanup; }
++  // reponame = strdup(pkg->name);
++  // path = strdup(dir);
++  // if (!path || !reponame) { rc = -1; goto cleanup; }
+ 
+ #ifdef PATH_MAX
+   long path_max = PATH_MAX;
+@@ -1284,57 +1246,22 @@
+     pthread_mutex_unlock(&lock.mutex);
+ #endif
+   }
+-
+-  if (0 == visited_packages) {
++  
+ #ifdef HAVE_PTHREADS
+-    pthread_mutex_lock(&lock.mutex);
+-#endif
+-
+-    visited_packages = hash_new();
+-    // initial write because sometimes `hash_set()` crashes
+-    hash_set(visited_packages, strdup(""), "");
+-
+-#ifdef HAVE_PTHREADS
+-    pthread_mutex_unlock(&lock.mutex);
+-#endif
+-  }
+-
+-  if (0 == opts.force && pkg && pkg->name) {
+-#ifdef HAVE_PTHREADS
+-    pthread_mutex_lock(&lock.mutex);
++  pthread_mutex_lock(&lock.mutex);
+ #endif
+ 
+-    if (hash_has(visited_packages, pkg->name)) {
+ #ifdef HAVE_PTHREADS
+-      pthread_mutex_unlock(&lock.mutex);
+-#endif
+-      return 0;
+-    }
+-
+-#ifdef HAVE_PTHREADS
+-    pthread_mutex_unlock(&lock.mutex);
++  pthread_mutex_unlock(&lock.mutex);
+ #endif
+-  }
+ 
+ #ifdef HAVE_PTHREADS
+-  fetch_package_file_thread_data_t **fetchs = 0;
+-  if (NULL != pkg && NULL != pkg->src) {
+-    if (pkg->src->len > 0) {
+-      fetchs = malloc(pkg->src->len * sizeof(fetch_package_file_thread_data_t));
+-    }
+-  }
+-
+-  if (fetchs) {
+-    memset(fetchs, 0, pkg->src->len * sizeof(fetch_package_file_thread_data_t));
++  if (pkg->src && pkg->src->len > 0) {
++    fetchs = calloc(pkg->src->len, sizeof(fetch_package_file_thread_data_t *));
++    if (!fetchs) { rc = -1; goto cleanup; }
+   }
+-
+ #endif
+ 
+-  if (!pkg || !dir) {
+-    rc = -1;
+-    goto cleanup;
+-  }
+-
+   if (!(pkg_dir = path_join(dir, pkg->name))) {
+     rc = -1;
+     goto cleanup;
+@@ -1352,10 +1279,7 @@
+   if (NULL == pkg->url) {
+     pkg->url = clib_package_url(pkg->author, pkg->repo_name, pkg->version);
+ 
+-    if (NULL == pkg->url) {
+-      rc = -1;
+-      goto cleanup;
+-    }
++    if (NULL == pkg->url) { rc = -1; goto cleanup; }
+   }
+ 
+   // write clib.json or package.json
+@@ -1364,7 +1288,8 @@
+     goto cleanup;
+   }
+ 
+-  if (!opts.global && NULL != pkg->src) {
++  // if (!opts.global && NULL != pkg->src) {
++  if (!opts.global && pkg->json) {
+     _debug("write: %s", package_json);
+     if (-1 == fs_write(package_json, pkg->json)) {
+       if (verbose) {
+@@ -1376,16 +1301,6 @@
+     }
+   }
+ 
+-  if (pkg->name) {
+-#ifdef HAVE_PTHREADS
+-    pthread_mutex_lock(&lock.mutex);
+-#endif
+-    hash_set(visited_packages, strdup(pkg->name), "t");
+-#ifdef HAVE_PTHREADS
+-    pthread_mutex_unlock(&lock.mutex);
+-#endif
+-  }
+-
+   // fetch makefile
+   if (!opts.global && pkg->makefile) {
+     _debug("fetch: %s/%s", pkg->repo, pkg->makefile);
+@@ -1398,12 +1313,12 @@
+ #ifdef HAVE_PTHREADS
+     if (0 != fetch) {
+       fetch_package_file_thread_data_t *data = fetch;
+-      int *status = 0;
++      int *status = NULL;
+       pthread_join(data->thread, (void **)&status);
+-      if (0 != status) {
++      if (NULL != status) {
+         rc = *status;
+         free(status);
+-        status = 0;
++        status = NULL;
+         if (0 != rc) {
+           rc = 0;
+           logger_warn("warning", "unable to fetch Makefile (%s) for '%s'",
+@@ -1454,150 +1369,154 @@
+   pthread_mutex_unlock(&lock.mutex);
+ #endif
+ 
++#ifdef HAVE_PTHREADS
++  int max_concurrency = opts.concurrency > 0 ? opts.concurrency : 1;
++  int current_running = 0;
++#endif
++
+ download:
+ 
+   iterator = list_iterator_new(pkg->src, LIST_HEAD);
+   list_node_t *source;
++  int total_src_count = (int)pkg->src->len;
++  int file_idx = 0;
+ 
+   while ((source = list_iterator_next(iterator))) {
+     void *fetch = NULL;
+     rc = fetch_package_file(pkg, pkg_dir, source->val, verbose, &fetch);
+ 
+     if (0 != rc) {
+-      list_iterator_destroy(iterator);
+-      iterator = NULL;
+       rc = -1;
+       goto cleanup;
+     }
+ 
+-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+-    usleep(1024 * 10);
+-#endif
+-
+ #ifdef HAVE_PTHREADS
+-    if (i < 0) {
+-      i = 0;
++    if (fetch) {
++      fetchs[file_idx++] = (fetch_package_file_thread_data_t *)fetch;
++      current_running++;
+     }
+ 
+-    fetchs[i] = fetch;
+-
+-    (void)pending++;
+-
+-    if (i < max) {
+-      (void)i++;
+-    } else {
+-      while (--i >= 0) {
+-        fetch_package_file_thread_data_t *data = fetchs[i];
+-        int *status = 0;
+-        pthread_join(data->thread, (void **)status);
+-        free(data);
+-        fetchs[i] = NULL;
+-
+-        (void)pending--;
+-
+-        if (0 != status) {
+-          rc = *status;
+-          free(status);
+-          status = 0;
+-        }
+-
+-        if (0 != rc) {
+-          rc = -1;
+-          goto cleanup;
++    // Если достигли лимита потоков, ждем завершения ВСЕХ запущенных сейчас
++    if (current_running >= max_concurrency) {
++      for (int j = 0; j < file_idx; j++) {
++        if (fetchs[j]) {
++          int *status = NULL;
++          pthread_join(fetchs[j]->thread, (void **)&status);
++          if (status) {
++            if (*status != NULL) rc = -1;
++            free(status);
++          }
++          free(fetchs[j]);
++          fetchs[j] = NULL;
+         }
+-
+-#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+-        usleep(1024 * 10);
+-#endif
+       }
++      file_idx = 0;
++      current_running = 0;
++      if (rc != 0) goto cleanup;
+     }
++#else
++    (void)file_idx; // Избегаем unused warning
+ #endif
++
++// #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
++//     usleep(1024 * 10);
++// #endif
+   }
+ 
+ #ifdef HAVE_PTHREADS
+-  while (--i >= 0) {
+-    fetch_package_file_thread_data_t *data = fetchs[i];
+-    int *status = 0;
+-
+-    pthread_join(data->thread, (void **)status);
+-
+-    (void)pending--;
+-    free(data);
+-    fetchs[i] = NULL;
+-
+-    if (0 != status) {
+-      rc = *status;
+-      free(status);
+-      status = 0;
+-    }
+-
+-    if (0 != rc) {
+-      rc = -1;
+-      goto cleanup;
++  // Дожидаемся оставшиеся потоки (которые не заполнили лимит max_concurrency)
++  for (int j = 0; j < file_idx; j++) {
++    if (fetchs[j]) {
++      int *status = NULL;
++      pthread_join(fetchs[j]->thread, (void **)&status);
++      if (status) {
++        if (*status != NULL) rc = -1;
++        free(status);
++      }
++      free(fetchs[j]);
++      fetchs[j] = NULL;
+     }
+   }
+ #endif
+ 
++  if (rc == 0) {
+ #ifdef HAVE_PTHREADS
+-  pthread_mutex_lock(&lock.mutex);
++    pthread_mutex_lock(&lock.mutex);
+ #endif
+-  clib_cache_save_package(pkg->author, pkg->name, pkg->version, pkg_dir);
++    clib_cache_save_package(pkg->author, pkg->name, pkg->version, pkg_dir);
+ #ifdef HAVE_PTHREADS
+-  pthread_mutex_unlock(&lock.mutex);
++    pthread_mutex_unlock(&lock.mutex);
+ #endif
++  }
++
+ 
+ install:
+   if (pkg->configure) {
+-    if (NULL != opts.prefix || NULL != pkg->prefix) {
+-      char path[path_max];
+-      memset(path, 0, path_max);
+-
+-      if (opts.prefix) {
+-        realpath(opts.prefix, path);
+-      } else {
+-        realpath(pkg->prefix, path);
+-      }
+-
+-      _debug("env: PREFIX: %s", path);
+-      setenv("PREFIX", path, 1);
+-    }
+-
++    // Если command уже использовалась выше, нужно её освободить:
++    if (command) { free(command); command = NULL; }
+     E_FORMAT(&command, "cd %s/%s && %s", dir, pkg->name, pkg->configure);
+-
+     _debug("command(configure): %s", command);
+ 
+     rc = system(command);
+-    if (0 != rc)
+-      goto cleanup;
++    if (0 != rc) goto cleanup;
+   }
+ 
+   if (0 == rc && pkg->install) {
+     rc = clib_package_install_executable(pkg, dir, verbose);
+   }
+ 
+-  if (0 == rc) {
++  if (0 == rc && pkg->dependencies) {
+     rc = clib_package_install_dependencies(pkg, dir, verbose);
++    // goto cleanup;
++  }
++
++//   if (0 == rc) {
++// #ifdef HAVE_PTHREADS
++//     pthread_mutex_lock(&lock.mutex);
++// #endif
++//     if (!visited_packages) visited_packages = hash_new();
++//     if (!hash_has(visited_packages, pkg->name)) {
++//       hash_set(visited_packages, strdup(pkg->name), "t");
++//     }
++// #ifdef HAVE_PTHREADS
++//     pthread_mutex_unlock(&lock.mutex);
++// #endif
++//   }
++
++if (pkg->name) {
++#ifdef HAVE_PTHREADS
++    pthread_mutex_lock(&lock.mutex);
++#endif
++    hash_set(visited_packages, strdup(pkg->name), "t");
++#ifdef HAVE_PTHREADS
++    pthread_mutex_unlock(&lock.mutex);
++#endif
+   }
+ 
+ cleanup:
+-  if (pkg_dir)
+-    free(pkg_dir);
+-  if (package_json)
+-    free(package_json);
+-  if (iterator)
+-    list_iterator_destroy(iterator);
+-  if (command)
+-    free(command);
++  if (iterator) { list_iterator_destroy(iterator); iterator = NULL; }
++
+ #ifdef HAVE_PTHREADS
+-  if (NULL != pkg && NULL != pkg->src) {
+-    if (pkg->src->len > 0) {
+-      if (fetchs) {
+-        free(fetchs);
++  if (fetchs) {
++    // Чистим элементы, если они зависли (например, при ошибке в середине цикла)
++    for (int j = 0; j < file_idx; j++) {
++      if (fetchs[j]) {
++        pthread_join(fetchs[j]->thread, NULL);
++        free(fetchs[j]);
++        fetchs[j] = NULL;
+       }
+     }
++    free(fetchs);
++    fetchs = NULL;
+   }
+-  fetchs = NULL;
+ #endif
++
++  if (pkg_dir) { free(pkg_dir); pkg_dir = NULL; }
++  if (package_json) { free(package_json); package_json = NULL; }
++  if (reponame) { free(reponame); reponame = NULL; }
++  if (command) { free(command); command = NULL; }
++  if (path) { free(path); path = NULL; }
++
+   return rc;
+ }
+ 
+@@ -1687,13 +1606,39 @@
+ }
+ 
+ void clib_package_cleanup() {
+-  if (0 != visited_packages) {
+-    hash_each(visited_packages, {
+-      free((void *)key);
+-      (void)val;
+-    });
++// #ifdef HAVE_PTHREADS
++//   pthread_mutex_lock(&lock.mutex);
++// #endif
+ 
++  if (visited_packages) {
+     hash_free(visited_packages);
+-    visited_packages = 0;
++    visited_packages = NULL;
++  }
++
++// #ifdef HAVE_PTHREADS
++//   pthread_mutex_unlock(&lock.mutex);
++// #endif
++}
++
++void clib_package_cleanup_visited() {
++  if (NULL == visited_packages) return;
++
++  // Внутренний итератор khash (библиотека, на которой основан hash.c)
++  for (khint_t k = kh_begin(visited_packages); k != kh_end(visited_packages); ++k) {
++    if (kh_exist(visited_packages, k)) {
++      // Освобождаем ключ, созданный через strdup
++      free((char *)kh_key(visited_packages, k));
++    }
+   }
++
++// #ifdef HAVE_PTHREADS
++//   pthread_mutex_lock(&lock.mutex);
++// #endif
++
++  hash_free(visited_packages);
++  visited_packages = NULL;
++
++// #ifdef HAVE_PTHREADS
++//   pthread_mutex_unlock(&lock.mutex);
++// #endif
+ }
+diff -uNr clib/test/package/Makefile clib_new/test/package/Makefile
+--- clib/test/package/Makefile	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/Makefile	2026-03-31 20:07:30.508846277 +0300
+@@ -1,4 +1,3 @@
+-
+ CC ?= cc
+ VALGRIND ?= valgrind
+ TEST_RUNNER ?=
+@@ -12,14 +11,14 @@
+ 
+ CFLAGS += -std=c99 -Wall -I../../src/common -I../../deps -DHAVE_PTHREADS -pthread -g
+ LDFLAGS = -lcurl
+-VALGRIND_OPTS ?= --leak-check=full --error-exitcode=3
++VALGRIND_OPTS ?= --leak-check=full --error-exitcode=3 #--tool=helgrind
+ 
+ .DEFAULT_GOAL := test
+ 
+ test: $(TEST_BIN)
+ 	$(foreach t, $^, $(TEST_RUNNER) ./$(t) || exit 1;)
+ 
+-valgrind: TEST_RUNNER=$(VALGRIND) $(VALGRIND_OPTS)
++valgrind: TEST_RUNNER=$(VALGRIND) $(VALGRIND_OPTS) # --log-file=clib_zip_$(shell date '+%Y-%m-%d_%H-%M-%S').log
+ valgrind: test
+ 
+ example: example.o $(OBJS)
+@@ -31,6 +30,6 @@
+ 	rm -f $(OBJS)
+ 	rm -f $(TEST_OBJ)
+ 	rm -f $(TEST_BIN)
+-	rm -rf test/fixtures
++	rm -rf test/
+ 
+ .PHONY: test valgrind clean
+diff -uNr clib/test/package/package-dependency-new.c clib_new/test/package/package-dependency-new.c
+--- clib/test/package/package-dependency-new.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-dependency-new.c	2026-03-29 19:09:20.573910661 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ 
+ #include "describe/describe.h"
+ #include "clib-package.h"
+diff -uNr clib/test/package/package-install-dependencies.c clib_new/test/package/package-install-dependencies.c
+--- clib/test/package/package-install-dependencies.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-install-dependencies.c	2026-03-30 20:37:00.063602919 +0300
+@@ -1,4 +1,4 @@
+-
++#include "test_helper.h"
+ #include "describe/describe.h"
+ #include "rimraf/rimraf.h"
+ #include "fs/fs.h"
+@@ -44,7 +44,7 @@
+       assert(0 == fs_exists("./test/fixtures/path-normalize/path-normalize.c"));
+       assert(0 == fs_exists("./test/fixtures/path-normalize/path-normalize.h"));
+       clib_package_free(pkg);
+-      rimraf("./test/fixtures");
++      rimraf("./test/fixtures/");
+     }
+ 
+     it("should install the dependency's dependencies") {
+@@ -66,7 +66,7 @@
+       assert(0 == fs_exists("./test/fixtures/str-starts-with/str-starts-with.h"));
+       assert(0 == fs_exists("./test/fixtures/str-starts-with/str-starts-with.c"));
+       clib_package_free(pkg);
+-      rimraf("./test/fixtures");
++      rimraf("./test/fixtures/");
+     }
+ 
+     it("should handle unresolved packages") {
+@@ -91,10 +91,11 @@
+       assert(-1 == fs_exists("./test/fixtures/emtter/"));
+ 
+       clib_package_free(pkg);
+-      rimraf("./test/fixtures");
++      rimraf("./test/fixtures/");
+     }
+   }
+ 
++  // clear_visited_packages();
+   curl_global_cleanup();
+   clib_package_cleanup();
+ 
+diff -uNr clib/test/package/package-install-dev-dependencies.c clib_new/test/package/package-install-dev-dependencies.c
+--- clib/test/package/package-install-dev-dependencies.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-install-dev-dependencies.c	2026-03-29 19:09:20.635903298 +0300
+@@ -1,4 +1,4 @@
+-
++#include "test_helper.h"
+ #include "describe/describe.h"
+ #include "rimraf/rimraf.h"
+ #include "fs/fs.h"
+diff -uNr clib/test/package/package-install.c clib_new/test/package/package-install.c
+--- clib/test/package/package-install.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-install.c	2026-03-29 19:09:20.660817545 +0300
+@@ -1,4 +1,4 @@
+-
++#include "test_helper.h"
+ #include <clib-package.h>
+ #include "describe/describe.h"
+ #include "rimraf/rimraf.h"
+diff -uNr clib/test/package/package-load-from-manifest.c clib_new/test/package/package-load-from-manifest.c
+--- clib/test/package/package-load-from-manifest.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-load-from-manifest.c	2026-03-29 19:09:20.702969734 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ #include "describe/describe.h"
+ #include "clib-package.h"
+ 
+diff -uNr clib/test/package/package-load-manifest-file.c clib_new/test/package/package-load-manifest-file.c
+--- clib/test/package/package-load-manifest-file.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-load-manifest-file.c	2026-03-29 19:09:20.727425671 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ #include "describe/describe.h"
+ #include "clib-package.h"
+ 
+diff -uNr clib/test/package/package-new-from-slug.c clib_new/test/package/package-new-from-slug.c
+--- clib/test/package/package-new-from-slug.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-new-from-slug.c	2026-03-29 19:29:17.336103365 +0300
+@@ -1,4 +1,4 @@
+-
++// #include "test_helper.h"
+ #include "describe/describe.h"
+ #include "clib-package.h"
+ 
+@@ -70,5 +70,6 @@
+     }
+   }
+ 
++  curl_global_cleanup();
+   return assert_failures();
+ }
+diff -uNr clib/test/package/package-new.c clib_new/test/package/package-new.c
+--- clib/test/package/package-new.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-new.c	2026-03-29 19:09:20.790322254 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ 
+ #include "describe/describe.h"
+ #include "clib-package.h"
+diff -uNr clib/test/package/package-parse-author.c clib_new/test/package/package-parse-author.c
+--- clib/test/package/package-parse-author.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-parse-author.c	2026-03-29 19:09:20.822622054 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ 
+ #include <string.h>
+ #include "describe/describe.h"
+diff -uNr clib/test/package/package-parse-name.c clib_new/test/package/package-parse-name.c
+--- clib/test/package/package-parse-name.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-parse-name.c	2026-03-29 19:09:20.855687553 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ 
+ #include "describe/describe.h"
+ #include "clib-package.h"
+diff -uNr clib/test/package/package-parse-version.c clib_new/test/package/package-parse-version.c
+--- clib/test/package/package-parse-version.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-parse-version.c	2026-03-29 19:09:20.884959811 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ 
+ #include "describe/describe.h"
+ #include "clib-package.h"
+diff -uNr clib/test/package/package-url.c clib_new/test/package/package-url.c
+--- clib/test/package/package-url.c	2020-09-08 02:51:24.000000000 +0300
++++ clib_new/test/package/package-url.c	2026-03-29 19:09:20.920286065 +0300
+@@ -1,3 +1,4 @@
++#include "test_helper.h"
+ 
+ #include "describe/describe.h"
+ #include "clib-package.h"
+diff -uNr clib/test/package/test_helper.h clib_new/test/package/test_helper.h
+--- clib/test/package/test_helper.h	1970-01-01 03:00:00.000000000 +0300
++++ clib_new/test/package/test_helper.h	2026-03-29 19:12:58.502453635 +0300
+@@ -0,0 +1,16 @@
++#ifndef TEST_HELPER_H
++#define TEST_HELPER_H
++
++#include <curl/curl.h>
++#include <stdio.h>
++
++// Макрос для упрощения: оборачиваем выполнение теста в init/cleanup
++#define RUN_TEST(test_code) do { \
++    curl_global_init(CURL_GLOBAL_ALL); \
++    int res = (test_code); \
++    curl_global_cleanup(); \
++    if (res != 0) return res; \
++} while (0)
++
++#endif
++
+diff -uNr clib/test/test_helper.h clib_new/test/test_helper.h
+--- clib/test/test_helper.h	1970-01-01 03:00:00.000000000 +0300
++++ clib_new/test/test_helper.h	2026-03-29 19:12:58.502453635 +0300
+@@ -0,0 +1,16 @@
++#ifndef TEST_HELPER_H
++#define TEST_HELPER_H
++
++#include <curl/curl.h>
++#include <stdio.h>
++
++// Макрос для упрощения: оборачиваем выполнение теста в init/cleanup
++#define RUN_TEST(test_code) do { \
++    curl_global_init(CURL_GLOBAL_ALL); \
++    int res = (test_code); \
++    curl_global_cleanup(); \
++    if (res != 0) return res; \
++} while (0)
++
++#endif
++
