@@ -5,7 +5,7 @@
 patch --dry-run -p1 -d clib/ < my_project.patch
 ```
 
-Если всё успешно, то получится следующий выволд:
+Если всё успешно, то получится следующий результат:
 ```sh
 checking file deps/hash/hash.h
 checking file src/common/clib-package.c
