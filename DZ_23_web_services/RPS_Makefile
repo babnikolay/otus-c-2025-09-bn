@@ -1,0 +1,72 @@
+# Настройки компилятора
+CC = gcc
+CFLAGS = -O3 -march=native -Wall -Wextra -Wpedantic -std=c11
+LDFLAGS = -pthread
+
+# Параметры сервера
+TARGET = rps_http_server
+SRC = rps_server.c
+FILES_DIR = files
+WWW_DIR ?= ./www
+PORT ?= 8080
+IP ?= 127.0.0.1
+
+# Цвета для вывода
+GREEN = \033[0;32m
+NC = \033[0m
+
+.PHONY: all clean run test stop reset
+
+# 1. Сборка сервера
+all: $(TARGET)
+	@echo "$(GREEN)✔ Сервер успешно собран с оптимизацией -O3$(NC)"
+
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)
+
+# 2. Подготовка окружения (каталог и тестовый файл)
+setup: .setup_done
+
+.setup_done:
+	@mkdir -p $(WWW_DIR)
+	@echo "Performance test content" > $(WWW_DIR)/test.txt
+	# Разрешаем огромную очередь входящих соединений
+	@sudo sysctl -w net.core.somaxconn=65535
+	@sudo sysctl -w net.ipv4.tcp_max_syn_backlog=65535
+	# Ускоряем обработку прерываний
+	@sudo sysctl -w net.core.netdev_max_backlog=65535
+	# Отключаем медленный старт TCP (актуально для локальных тестов)
+	@sudo sysctl -w net.ipv4.tcp_slow_start_after_idle=0
+	# Увеличиваем лимиты файлов
+	@ulimit -n 100000
+	@touch .setup_done
+	@echo "$(GREEN)✔ Система максимально тюнингована под 2 ядра.$(NC)"
+
+
+# 3. Запуск сервера
+run: $(TARGET) setup
+	@echo "$(GREEN)🚀 Запуск сервера на $(IP):$(PORT)...$(NC)"
+	@./$(TARGET) $(WWW_DIR) $(IP):$(PORT) & \
+	echo "Server started at $(ARGS) (PID: $$!)"
+
+# 4. Остановка сервера
+stop:
+	@echo "🛑 Остановка всех процессов $(TARGET)..."
+	@pkill -f ./$(TARGET) || echo "Процессы не найдены."
+	@echo "$(GREEN)✔ Сервер остановлен.$(NC)"
+
+# Добавим очистку сокетов (опционально)
+reset: stop
+	@sudo sysctl -w net.ipv4.tcp_tw_reuse=1
+	@echo "$(GREEN)✔ Сетевой стек сброшен.$(NC)"
+
+# 5. Запуск бенчмарка (нужен установленный wrk)
+test:
+	@echo "$(GREEN)📊 Запуск теста производительности...$(NC)"
+	wrk -t1 -c100 -d10s --timeout 5s -H "Connection: keep-alive" http://$(IP):$(PORT)/test.txt
+
+# 6. Очистка
+clean:
+	rm -f $(TARGET) .setup_done
+	rm -rf $(WWW_DIR)
+	@echo "🧹 Очищено."
