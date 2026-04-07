@@ -26,14 +26,14 @@
 *.jar
 *.rar
 *.tar
-# *.zip
+*.zip
+test.*
 
 # Projects
 obj/
 dist/
 build/
 Cursovaya/
-# DZ_9_Unix_program/*.zip
 Project/
 DZ_32_DB/
 Test/
