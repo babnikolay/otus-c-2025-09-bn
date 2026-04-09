@@ -2,8 +2,13 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
 
-#define BUFFER_SIZE 65536 // Буфер 64 КБ
+// #define BUFFER_SIZE 65536 // Буфер 64 КБ
 #define BUFFER 256
 uint32_t crc32_table[BUFFER];
 
@@ -20,52 +25,59 @@ void generate_table() {
     }
 }
 
-uint32_t calculate_crc32(FILE *f) {
+uint32_t calculate_crc32(const uint8_t *data, size_t length) {
     uint32_t crc = 0xFFFFFFFF;
-    uint8_t buffer[BUFFER_SIZE];
-    size_t bytes_read;
 
-    rewind(f);  // Сбрасываем указатель в начало файла
-
-    while ((bytes_read = fread(buffer, 1, sizeof(buffer), f)) > 0) {
-        for (size_t i = 0; i < bytes_read; i++) {
-            uint8_t index = (crc ^ buffer[i]) & 0xFF;
-            crc = (crc >> 8) ^ crc32_table[index];
-        }
+    for (size_t i = 0; i < length; i++) {
+        uint8_t index = (crc ^ data[i]) & 0xFF;
+        crc = (crc >> 8) ^ crc32_table[index];
     }
 
     return crc ^ 0xFFFFFFFF;
 }
 
 int main(int argc, char *argv[]) {
-    // Фиксируем время начала
-    time_t start_time = time(NULL);
-    printf("Начало: %s\n", ctime(&start_time));
-
     if (argc != 2) {
         fprintf(stderr, "Использование: %s <путь_к_файлу>\n", argv[0]);
         return 1;
     }
 
+    // Фиксируем время начала
+    time_t start_time = time(NULL);
+    printf("Начало: %s\n", ctime(&start_time));
+
     generate_table(); // Инициализируем таблицу перед расчетом
 
-    FILE *file = fopen(argv[1], "rb");
-    if (!file) {
+    int fd = open(argv[1], O_RDONLY);
+    if (fd == -1) {
         perror("Ошибка открытия файла");
         return 1;
     }
 
-    uint32_t result = calculate_crc32(file);
-    
-    if (ferror(file)) {
-        fprintf(stderr, "Ошибка при чтении файла.\n");
-        fclose(file);
+    // Получаем размер файла
+    struct stat st;
+    if (fstat(fd, &st) == -1) {
+        perror("Ошибка fstat");
+        close(fd);
         return 1;
     }
 
+    // Отображаем файл в память (Shared Memory)
+    // PROT_READ — только чтение, MAP_SHARED — изменения видны другим процессам
+    uint8_t *mapped = mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    if (mapped == MAP_FAILED) {
+        perror("Ошибка mmap");
+        close(fd);
+        return 1;
+    }
+    
+    uint32_t result = calculate_crc32(mapped, st.st_size);
+    
     printf("%08x\n", result);
 
-    fclose(file);
+    // Освобождаем ресурсы
+    munmap(mapped, st.st_size);
+    close(fd);
 
     // 2. Фиксируем время окончания
     time_t end_time = time(NULL);
