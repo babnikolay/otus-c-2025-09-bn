@@ -1,9 +1,13 @@
-#include "logger.h"
+#define _GNU_SOURCE         // Необходимо для gettid() в Linux
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/syscall.h>    // Для syscall(SYS_gettid)
 #include <stdarg.h>
 #include <time.h>
 #include <execinfo.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "logger.h"
 
 #define BUFFER 64
 
@@ -14,15 +18,46 @@ static const char* level_strings[] = {
     "DEBUG", "INFO", "WARNING", "ERROR"
 };
 
+// Функции-обработчики для атфорка
+static void prepare(void) {
+    pthread_mutex_lock(&log_mutex);
+}
+
+static void parent(void) {
+    pthread_mutex_unlock(&log_mutex);
+}
+
+static void child(void) {
+    pthread_mutex_unlock(&log_mutex);
+}
+
+// Вспомогательная функция для получения ID потока
+static pid_t get_tid(void) {
+#ifdef __linux__
+    return syscall(SYS_gettid);
+#else
+    return (pid_t)pthread_self(); // Упрощенно для других систем
+#endif
+}
+
 int log_init(const char *filename) {
     if (!filename) return -1;
 
+    // Регистрируем обработчики один раз
+    // prepare: вызывается в родителе ПЕРЕД fork (блокирует мьютекс)
+    // parent: вызывается в родителе ПОСЛЕ fork (разблокирует)
+    // child: вызывается в потомке ПОСЛЕ fork (разблокирует копию мьютекса)
+    static int atfork_registered = 0;
+    if (!atfork_registered) {
+        if (pthread_atfork(prepare, parent, child) == 0) {
+            atfork_registered = 1;
+        }
+    }
+
     // Блокируем на случай, если кто-то пытается переинициализировать логгер
     pthread_mutex_lock(&log_mutex);
-
-     if (log_file) fclose(log_file); // Закрываем старый файл, если был открыт
+    if (log_file) fclose(log_file); // Закрываем старый файл, если был открыт
     log_file = fopen(filename, "a");
-    
     pthread_mutex_unlock(&log_mutex);
 
     return log_file != NULL ? 0 : -1;
@@ -74,7 +109,14 @@ void log_message(log_level_t level, const char *file, int line, const char *fmt,
     }
 
     // Заголовок: [Время] [УРОВЕНЬ] [Файл:Строка]
-    fprintf(log_file, "[%s] [%s] [%s:%d]: ", time_buf, level_strings[level], file, line);
+    // [Время] [PID:TID] [УРОВЕНЬ] [Файл:Строка]
+    fprintf(log_file, "[%s] [%d:%d] [%-7s] [%s:%d]: ", 
+            time_buf, 
+            getpid(),    // ID процесса
+            get_tid(),   // ID потока
+            level_strings[level], 
+            file, 
+            line);
 
     // Само сообщение
     va_list args;

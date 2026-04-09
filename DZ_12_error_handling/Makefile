@@ -7,7 +7,8 @@ CC       = gcc
 SRC_DIR  = src
 INC_DIR  = include
 OBJ_DIR  = obj
-BIN_DIR  = dist/bin
+DIST_DIR = dist
+BIN_DIR  = $(DIST_DIR)/bin
 
 # Флаги
 # -rdynamic и -pthread важны для работы стека и потоков
@@ -53,7 +54,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 # Очистка
 clean:
-	@rm -rf $(OBJ_DIR) $(BIN_DIR) $(LIB_NAME) app.log
+	@rm -rf $(OBJ_DIR) $(DIST_DIR) $(LIB_NAME) app.log
 	@echo "$(RED)Проект очищен.$(NC)"
 
 # Запуск
