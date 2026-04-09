@@ -78,7 +78,7 @@ SOCKET_PATH=/tmp/fsd.sock
 
 ## Изменение файла /tmp/target_file.txt  
 ```sh
-echo "zxcvbnmqwertyu" >> /tmp/target_file.txt
+echo "zxcvbnmqwertyu" >> /tmp/target_file.txt && cat /tmp/target_file.txt
 ```
 
 ## Остановка:  
