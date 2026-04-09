@@ -1,6 +1,6 @@
-# File Size Daemon (FSD)
-------------------------------
-Минималистичный системный демон на языке Си для мониторинга размера файлов через UNIX-сокеты.  
+# File Size Daemon (FSD)  
+
+### Минималистичный системный демон на языке Си для мониторинга размера файлов через UNIX-сокеты.  
 
 ## Особенности  
 
@@ -27,7 +27,9 @@ make
 make config
 ```
 
-Это создаст файл daemon.conf с путями /tmp/target_file.txt и /tmp/file_size_daemon.sock.  
+Это создаст файл daemon.conf с путями /tmp/target_file.txt и /tmp/file_size_daemon.sock и 
+файл /tmp/target_file.txt.
+
 3. Запуск демона:  
 ```sh
 make daemon
@@ -57,17 +59,39 @@ make run
 ## Конфигурация (daemon.conf)  
 Файл конфигурации должен находиться в той же папке, что и исполняемый файл.  
 
-# Путь к файлу для мониторинга  
+### Путь к файлу для мониторинга  
 ```sh
 FILE_PATH=/tmp/my_log.log
 ```
 
-# Путь к UNIX-сокету  
+### Путь к UNIX-сокету  
 ```sh
 SOCKET_PATH=/tmp/fsd.sock
 ```
 
-## Детали реализации  
+## Ручное управлене  
+
+## Запуск в режиме демона  
+```sh
+./fsd -d
+```
+
+## Изменение файла /tmp/target_file.txt  
+```sh
+echo "zxcvbnmqwertyu" >> /tmp/target_file.txt
+```
+
+## Остановка:  
+```sh
+kill $(cat /tmp/file_size_daemon.pid)
+```
+
+### Перезагрузка конфига:  
+```sh
+kill -HUP $(cat /tmp/file_size_daemon.pid)
+```
+
+### Детали реализации  
 
 * Сигналы: Использование sigaction вместо устаревшего signal для надежной обработки SIGHUP без прерывания критических операций.  
 * Сборка: Компиляция с флагами -Wall -Wextra -pedantic гарантирует чистоту кода и отсутствие утечек логики.  
