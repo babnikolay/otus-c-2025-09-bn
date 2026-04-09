@@ -44,18 +44,20 @@ void run_worker(const char *ip, int port, __attribute__((unused)) const char *di
     
     int opt = 1;
     setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)); // Магия тут
+    setsockopt(listen_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
     
     struct sockaddr_in addr = { .sin_family = AF_INET, .sin_port = htons(port) };
     inet_pton(AF_INET, ip, &addr.sin_addr);
 
+    char *a = "";
     if (bind(listen_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        perror("bind"); exit(1);
+        a = "bind";
+        goto exit_fail;
     }
     
-    if (listen(listen_fd, 65535) < 0) { 
-        perror("listen"); 
-        exit(1); 
+    if (listen(listen_fd, 65535) < 0) {
+        a = "listen";
+        goto exit_fail;
     }
     set_nonblocking(listen_fd);
 
@@ -85,10 +87,12 @@ void run_worker(const char *ip, int port, __attribute__((unused)) const char *di
             }
         }
     }
+exit_fail:
+    perror(a); exit(EXIT_FAILURE);
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) return 1;
+    if (argc != 3) exit(EXIT_FAILURE);
 
     char *dir = argv[1];
     char *ip = strtok(argv[2], ":");
@@ -100,10 +104,11 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < NUM_WORKERS; i++) {
         if (fork() == 0) {
             run_worker(ip, port, dir);
-            exit(0);
+            _exit(EXIT_SUCCESS);
         }
     }
 
     while (wait(NULL) > 0); // Ждем воркеров
-    return 0;
+
+    exit(EXIT_SUCCESS);
 }
