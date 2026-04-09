@@ -125,8 +125,7 @@ int main(int argc, char *argv[]) {
     pid_fd = check_and_write_pid();
     if (pid_fd < 0) {
         syslog(LOG_ERR, "Daemon already running or PID file error");
-        closelog();
-        return EXIT_FAILURE;
+        goto fail;
     }
 
 recreate_socket:
@@ -188,6 +187,7 @@ exit_fail:
     if (server_fd != -1) { close(server_fd); unlink(current_socket_path); }
     if (pid_fd != -1) close(pid_fd);
     remove_pid_file();
+fail:
     closelog();
     return EXIT_FAILURE;
 }
