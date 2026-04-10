@@ -35,5 +35,5 @@ dist/
 build/
 Cursovaya/
 Project/
-DZ_32_DB/
 Test/
+db_sqlite*
