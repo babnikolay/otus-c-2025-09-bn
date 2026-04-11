@@ -1,16 +1,3 @@
-/*
-Программу нужно скомпилировать с флагами
-Для компиляции программы с флагами, указанными в задании, используйте следующую команду в терминале:
-gcc -Wall -Wextra -Wpedantic -std=c11 -o rarjpeg_checker rarjpeg_checker.c
-
-Объяснение работы программы:
-1. Прием аргументов командной строки: Программа ожидает, что файл будет передан в качестве аргумента командной строки.
-2. Проверка файла: Открывается файл, и его содержимое анализируется. Если в конце файла обнаруживается "Rar!", значит, это Rarjpeg.
-3. Определение ZIP-архива: Далее программа пробует прочитать заголовок файла. Если он соответствует заголовку ZIP, программа выводит сообщение о том, что файл является zip-архивом.
-4. Чтение содержимого файло: Программа в текущем виде не разбирает содержимое ZIP-архива, но оставляет комментарии, что это можно сделать.
-Этот код можно использовать в рамках вашей задачи, добавив более детальную логику для разбора ZIP-архивов в случае необходимости.
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -101,7 +88,10 @@ int main(int argc, char *argv[]) {
     // Перемещение к началу поиска
     for (long i = file_size - 4; i >= 0; i--) {
         fseek(file, i, SEEK_SET);
-        fread(&eocd.signature, sizeof(eocd.signature), 1, file);
+        if (fread(&eocd.signature, sizeof(eocd.signature), 1, file) == 1) {
+            // printf("LFH сигнатура не найдена\n");
+            continue;;
+        }
 
         if (eocd.signature == EOCD_SIGNATURE) {
             printf("EOCD сигнатура найдена на смещении: %ld\n", i);
@@ -109,7 +99,10 @@ int main(int argc, char *argv[]) {
             printf("\nЭто ZIP файл\n\n");
 
             fseek(file, i, SEEK_SET);
-            fread(&eocd, sizeof(eocd), 1, file);
+            if (fread(&eocd, sizeof(eocd), 1, file) != 1) {
+                fprintf(stderr, "Ошибка чтения заголовка eocd\n");
+                break;
+            }
             printf("EOCD Details:\n");
             printf("Сигнатура: %#.8x\n", eocd.signature);
             printf("Номер диска, где находится начало Central Directory: %u\n", eocd.diskNumber);
@@ -137,14 +130,20 @@ int main(int argc, char *argv[]) {
 
     for (long i = file_size - sizeof(eocd); i >= 0; i--) {
         fseek(file, i, SEEK_SET);
-        fread(&cdfh.signature, sizeof(cdfh.signature), 1, file);
+        if (fread(&cdfh.signature, sizeof(cdfh.signature), 1, file) == 1) {
+            // printf("LFH сигнатура не найдена\n");
+            continue;;
+        }
 
         if (cdfh.signature == CDFH_SIGNATURE) {
             printf("CDFH сигнатура найдена на смещении: %ld\n", i);
             printf("cdfh.signature: %#.8x\n", cdfh.signature);
 
             fseek(file, i, SEEK_SET);
-            fread(&cdfh, sizeof(cdfh), 1, file);
+            if (fread(&cdfh, sizeof(cdfh), 1, file) != 1) {
+                fprintf(stderr, "Ошибка чтения заголовка cdfh\n");
+                break;
+            }
             printf("CDFH Details:\n");
             printf("Сигнатура: %#.8x\n", cdfh.signature);
             printf("Смещение до структуры LocalFileHeader: %u\n", cdfh.localFileHeaderOffset);
@@ -163,7 +162,10 @@ int main(int argc, char *argv[]) {
     unsigned int j = 0;
     for (long unsigned int i = 0; i <= (file_size - sizeof(cdfh)); i++) {
         fseek(file, i, SEEK_SET);
-        fread(&lfh.signature, sizeof(lfh.signature), 1, file);
+        if (fread(&lfh.signature, sizeof(lfh.signature), 1, file) == 1) {
+            // printf("LFH сигнатура не найдена\n");
+            continue;;
+        }
         if (lfh.signature == LFH_SIGNATURE) {
             printf("\n");
             j++;
@@ -174,8 +176,11 @@ int main(int argc, char *argv[]) {
             size_t file_pos = ftell(file);
             printf("file_pos: %ld\n\n", file_pos);
             fseek(file, i, SEEK_SET);
-            fread(&lfh, sizeof(lfh), 1, file);  // Смещение в файле остаётся в конце структуры и указывает на начало имени файла
-            
+            // Смещение в файле остаётся в конце структуры и указывает на начало имени файла
+            if (fread(&lfh, sizeof(lfh), 1, file) != 1) {
+                fprintf(stderr, "Ошибка чтения заголовка LFH\n");
+                break;
+            }
             printf("LFH Details:\n");
             printf("Сигнатура: %#.8x\n", lfh.signature);
             printf("Версия, необходимая для извлечения: %u\n", lfh.versionNeeded);
@@ -195,9 +200,13 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "Ошибка выделения памяти\n");
             }
             else {
-                fread(filename, 1, lfh.fileNameLength, file);
-                filename[lfh.fileNameLength] = '\0';
-                printf("Имя файла: %s\n", filename);
+                if (fread(filename, 1, lfh.fileNameLength, file) != lfh.fileNameLength) {
+                    fprintf(stderr, "Ошибка при чтении имени файла\n");
+                }
+                else {
+                    filename[lfh.fileNameLength] = '\0';
+                    printf("Имя файла: %s\n", filename);
+                }
 
                 if (filename) {
                     free(filename);

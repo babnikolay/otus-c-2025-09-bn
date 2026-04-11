@@ -584,10 +584,10 @@ B           - Синий для палитры. [0.0]
 ```
 
 
-### 8. mandelbrot_budda.c 
+### 8. mandelbrot_budda.c  
 
 
-Программа вычисляет и выводит в PNG файл множество Мандельброта - Будда.
+Программа вычисляет и выводит в PNG файл множество Мандельброта - Будда.  
 
 ```sh
 $ gcc -O3 mandelbrot_budda.c -o mandelbrot_budda -Wall -Wextra -Wpedantic -lSDL2 -lm -fopenmp
@@ -599,7 +599,7 @@ $ gcc -O3 mandelbrot_budda.c -o mandelbrot_budda -Wall -Wextra -Wpedantic -lSDL2
 $ ./mandelbrot_budda 0.9 1.2 0.3
 ```
 
-При запуске программы без параметров, она выдаст сообщение, как правильно её запускать: 
+При запуске программы без параметров, она выдаст сообщение, как правильно её запускать:  
 
 ```sh
 Использование: ./mandelbrot_budda R G B

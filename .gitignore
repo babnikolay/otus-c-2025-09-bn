@@ -27,7 +27,6 @@
 *.rar
 *.tar
 *.zip
-test.*
 
 # Projects
 obj/
@@ -37,3 +36,6 @@ Cursovaya/
 Project/
 Test/
 db_sqlite*
+test.*
+*.jpeg
+*.jpg
