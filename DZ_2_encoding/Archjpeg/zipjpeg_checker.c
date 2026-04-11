@@ -88,10 +88,7 @@ int main(int argc, char *argv[]) {
     // Перемещение к началу поиска
     for (long i = file_size - 4; i >= 0; i--) {
         fseek(file, i, SEEK_SET);
-        if (fread(&eocd.signature, sizeof(eocd.signature), 1, file) == 1) {
-            // printf("LFH сигнатура не найдена\n");
-            continue;;
-        }
+        fread(&eocd.signature, sizeof(eocd.signature), 1, file);
 
         if (eocd.signature == EOCD_SIGNATURE) {
             printf("EOCD сигнатура найдена на смещении: %ld\n", i);
@@ -99,10 +96,8 @@ int main(int argc, char *argv[]) {
             printf("\nЭто ZIP файл\n\n");
 
             fseek(file, i, SEEK_SET);
-            if (fread(&eocd, sizeof(eocd), 1, file) != 1) {
-                fprintf(stderr, "Ошибка чтения заголовка eocd\n");
-                break;
-            }
+            fread(&eocd, sizeof(eocd), 1, file);
+
             printf("EOCD Details:\n");
             printf("Сигнатура: %#.8x\n", eocd.signature);
             printf("Номер диска, где находится начало Central Directory: %u\n", eocd.diskNumber);
@@ -130,20 +125,14 @@ int main(int argc, char *argv[]) {
 
     for (long i = file_size - sizeof(eocd); i >= 0; i--) {
         fseek(file, i, SEEK_SET);
-        if (fread(&cdfh.signature, sizeof(cdfh.signature), 1, file) == 1) {
-            // printf("LFH сигнатура не найдена\n");
-            continue;;
-        }
+        fread(&cdfh.signature, sizeof(cdfh.signature), 1, file);
 
         if (cdfh.signature == CDFH_SIGNATURE) {
             printf("CDFH сигнатура найдена на смещении: %ld\n", i);
             printf("cdfh.signature: %#.8x\n", cdfh.signature);
 
             fseek(file, i, SEEK_SET);
-            if (fread(&cdfh, sizeof(cdfh), 1, file) != 1) {
-                fprintf(stderr, "Ошибка чтения заголовка cdfh\n");
-                break;
-            }
+            fread(&cdfh, sizeof(cdfh), 1, file);
             printf("CDFH Details:\n");
             printf("Сигнатура: %#.8x\n", cdfh.signature);
             printf("Смещение до структуры LocalFileHeader: %u\n", cdfh.localFileHeaderOffset);
@@ -162,10 +151,8 @@ int main(int argc, char *argv[]) {
     unsigned int j = 0;
     for (long unsigned int i = 0; i <= (file_size - sizeof(cdfh)); i++) {
         fseek(file, i, SEEK_SET);
-        if (fread(&lfh.signature, sizeof(lfh.signature), 1, file) == 1) {
-            // printf("LFH сигнатура не найдена\n");
-            continue;;
-        }
+        fread(&lfh.signature, sizeof(lfh.signature), 1, file);
+
         if (lfh.signature == LFH_SIGNATURE) {
             printf("\n");
             j++;
@@ -177,10 +164,8 @@ int main(int argc, char *argv[]) {
             printf("file_pos: %ld\n\n", file_pos);
             fseek(file, i, SEEK_SET);
             // Смещение в файле остаётся в конце структуры и указывает на начало имени файла
-            if (fread(&lfh, sizeof(lfh), 1, file) != 1) {
-                fprintf(stderr, "Ошибка чтения заголовка LFH\n");
-                break;
-            }
+            fread(&lfh, sizeof(lfh), 1, file);
+
             printf("LFH Details:\n");
             printf("Сигнатура: %#.8x\n", lfh.signature);
             printf("Версия, необходимая для извлечения: %u\n", lfh.versionNeeded);
