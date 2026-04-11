@@ -132,10 +132,10 @@ libcurl_la-curl_range.lo: curl_range.c /usr/include/stdc-predef.h \
  ../include/curl/options.h ../include/curl/header.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
  ../include/curl/typecheck-gcc.h curl_range.h urldata.h cookie.h llist.h \
- psl.h /usr/include/libpsl.h formdata.h bufref.h \
- /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/bits/in.h \
- curlx/timeval.h curlx/../curl_setup.h curlx/timediff.h http_chunks.h \
- curlx/dynbuf.h hostip.h hash.h curl_addrinfo.h /usr/include/netdb.h \
+ psl.h formdata.h bufref.h /usr/include/netinet/in.h \
+ /usr/include/x86_64-linux-gnu/bits/in.h curlx/timeval.h \
+ curlx/../curl_setup.h curlx/timediff.h http_chunks.h curlx/dynbuf.h \
+ hostip.h hash.h curl_addrinfo.h /usr/include/netdb.h \
  /usr/include/rpc/netdb.h \
  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
@@ -318,7 +318,6 @@ urldata.h:
 cookie.h:
 llist.h:
 psl.h:
-/usr/include/libpsl.h:
 formdata.h:
 bufref.h:
 /usr/include/netinet/in.h:

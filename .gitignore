@@ -26,7 +26,7 @@
 *.jar
 *.rar
 *.tar
-*.zip
+# *.zip
 
 # Projects
 obj/

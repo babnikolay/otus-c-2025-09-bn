@@ -142,17 +142,16 @@ curlinfo.o: curlinfo.c /usr/include/stdc-predef.h ../lib/curl_setup.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
  /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
  ../lib/asyn.h ../lib/httpsrr.h ../lib/curl_threads.h ../lib/multi_ev.h \
- ../lib/multi_ntfy.h ../lib/uint-bset.h ../lib/psl.h \
- /usr/include/libpsl.h ../lib/socketpair.h ../lib/uint-spbset.h \
- ../lib/uint-table.h tool_xattr.h tool_setup.h ../lib/curlx/curlx.h \
- ../lib/curlx/binmode.h ../lib/curlx/nonblock.h ../lib/curlx/multibyte.h \
- ../lib/curlx/version_win32.h ../lib/curlx/strerr.h \
- ../lib/curlx/strparse.h ../lib/curlx/strcopy.h ../lib/curlx/dynbuf.h \
- ../lib/curlx/fopen.h ../lib/curlx/base64.h ../lib/curlx/timeval.h \
- ../lib/curlx/wait.h ../lib/curlx/winapi.h ../lib/curlx/inet_pton.h \
- ../lib/curlx/inet_ntop.h /usr/include/x86_64-linux-gnu/sys/xattr.h \
- ../lib/curl_sha512_256.h ../lib/curl_hmac.h ../lib/asyn.h \
- ../lib/fake_addrinfo.h \
+ ../lib/multi_ntfy.h ../lib/uint-bset.h ../lib/psl.h ../lib/socketpair.h \
+ ../lib/uint-spbset.h ../lib/uint-table.h tool_xattr.h tool_setup.h \
+ ../lib/curlx/curlx.h ../lib/curlx/binmode.h ../lib/curlx/nonblock.h \
+ ../lib/curlx/multibyte.h ../lib/curlx/version_win32.h \
+ ../lib/curlx/strerr.h ../lib/curlx/strparse.h ../lib/curlx/strcopy.h \
+ ../lib/curlx/dynbuf.h ../lib/curlx/fopen.h ../lib/curlx/base64.h \
+ ../lib/curlx/timeval.h ../lib/curlx/wait.h ../lib/curlx/winapi.h \
+ ../lib/curlx/inet_pton.h ../lib/curlx/inet_ntop.h \
+ /usr/include/x86_64-linux-gnu/sys/xattr.h ../lib/curl_sha512_256.h \
+ ../lib/curl_hmac.h ../lib/asyn.h ../lib/fake_addrinfo.h \
  /usr/include/x86_64-linux-gnu/openssl/opensslconf.h \
  /usr/include/x86_64-linux-gnu/openssl/configuration.h \
  /usr/include/openssl/macros.h /usr/include/openssl/opensslv.h
@@ -350,7 +349,6 @@ curlinfo.o: curlinfo.c /usr/include/stdc-predef.h ../lib/curl_setup.h \
 ../lib/multi_ntfy.h:
 ../lib/uint-bset.h:
 ../lib/psl.h:
-/usr/include/libpsl.h:
 ../lib/socketpair.h:
 ../lib/uint-spbset.h:
 ../lib/uint-table.h:

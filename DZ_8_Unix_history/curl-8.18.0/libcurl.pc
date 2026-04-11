@@ -22,20 +22,20 @@
 #
 ###########################################################################
 
-prefix=/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history
+prefix=/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 supported_protocols="HTTP HTTPS TELNET"
-supported_features="alt-svc AsynchDNS HSTS HTTPSRR IPv6 Largefile PSL SSL threadsafe"
+supported_features="alt-svc AsynchDNS brotli HSTS HTTPSRR IPv6 Largefile libz SSL threadsafe zstd"
 
 Name: libcurl
 URL: https://curl.se/
 Description: Library to transfer files with HTTP, FTP, etc.
 Version: 8.18.0
 Requires: 
-Requires.private: openssl,libpsl
+Requires.private: zlib,libbrotlidec,libbrotlicommon,libzstd,openssl
 Libs: -L${libdir} -lcurl 
-Libs.private:  -lpsl -lssl -lcrypto
+Libs.private:  -lssl -lcrypto -lssl -lcrypto -lzstd -lbrotlidec -lz
 Cflags: -I${includedir} 
 Cflags.private: -DCURL_STATICLIB

@@ -134,12 +134,12 @@ vquic/libcurlu_la-vquic.lo: vquic/vquic.c /usr/include/stdc-predef.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
  ../include/curl/typecheck-gcc.h /usr/include/netinet/udp.h \
  vquic/../urldata.h vquic/../cookie.h vquic/../llist.h vquic/../psl.h \
- /usr/include/libpsl.h vquic/../formdata.h vquic/../bufref.h \
- /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/bits/in.h \
- vquic/../curlx/timeval.h vquic/../curlx/../curl_setup.h \
- vquic/../curlx/timediff.h vquic/../http_chunks.h vquic/../curlx/dynbuf.h \
- vquic/../hostip.h vquic/../hash.h vquic/../curl_addrinfo.h \
- /usr/include/netdb.h /usr/include/rpc/netdb.h \
+ vquic/../formdata.h vquic/../bufref.h /usr/include/netinet/in.h \
+ /usr/include/x86_64-linux-gnu/bits/in.h vquic/../curlx/timeval.h \
+ vquic/../curlx/../curl_setup.h vquic/../curlx/timediff.h \
+ vquic/../http_chunks.h vquic/../curlx/dynbuf.h vquic/../hostip.h \
+ vquic/../hash.h vquic/../curl_addrinfo.h /usr/include/netdb.h \
+ /usr/include/rpc/netdb.h \
  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
  /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
@@ -331,7 +331,6 @@ vquic/../urldata.h:
 vquic/../cookie.h:
 vquic/../llist.h:
 vquic/../psl.h:
-/usr/include/libpsl.h:
 vquic/../formdata.h:
 vquic/../bufref.h:
 /usr/include/netinet/in.h:

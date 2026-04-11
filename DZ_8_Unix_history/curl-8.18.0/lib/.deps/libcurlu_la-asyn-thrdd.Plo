@@ -137,15 +137,15 @@ libcurlu_la-asyn-thrdd.lo: asyn-thrdd.c /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
  /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
- urldata.h cookie.h llist.h psl.h /usr/include/libpsl.h formdata.h \
- bufref.h curlx/timeval.h curlx/../curl_setup.h curlx/timediff.h \
- http_chunks.h curlx/dynbuf.h hostip.h hash.h curl_addrinfo.h asyn.h \
- httpsrr.h curl_threads.h splay.h dynhds.h request.h bufq.h ratelimit.h \
- netrc.h mime.h ftp.h pingpong.h http.h smb.h mqtt.h ftplistparser.h \
- multihandle.h conncache.h cshutdn.h multi_ev.h multi_ntfy.h uint-bset.h \
- uint-spbset.h uint-table.h cf-socket.h sockaddr.h cfilters.h \
- curlx/timediff.h curl_trc.h url.h multiif.h progress.h select.h \
- /usr/include/poll.h /usr/include/x86_64-linux-gnu/sys/poll.h \
+ urldata.h cookie.h llist.h psl.h formdata.h bufref.h curlx/timeval.h \
+ curlx/../curl_setup.h curlx/timediff.h http_chunks.h curlx/dynbuf.h \
+ hostip.h hash.h curl_addrinfo.h asyn.h httpsrr.h curl_threads.h splay.h \
+ dynhds.h request.h bufq.h ratelimit.h netrc.h mime.h ftp.h pingpong.h \
+ http.h smb.h mqtt.h ftplistparser.h multihandle.h conncache.h cshutdn.h \
+ multi_ev.h multi_ntfy.h uint-bset.h uint-spbset.h uint-table.h \
+ cf-socket.h sockaddr.h cfilters.h curlx/timediff.h curl_trc.h url.h \
+ multiif.h progress.h select.h /usr/include/poll.h \
+ /usr/include/x86_64-linux-gnu/sys/poll.h \
  /usr/include/x86_64-linux-gnu/bits/poll.h \
  /usr/include/x86_64-linux-gnu/bits/poll2.h
 /usr/include/stdc-predef.h:
@@ -329,7 +329,6 @@ urldata.h:
 cookie.h:
 llist.h:
 psl.h:
-/usr/include/libpsl.h:
 formdata.h:
 bufref.h:
 curlx/timeval.h:

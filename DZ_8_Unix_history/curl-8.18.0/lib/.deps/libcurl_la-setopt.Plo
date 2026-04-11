@@ -136,10 +136,10 @@ libcurl_la-setopt.lo: setopt.c /usr/include/stdc-predef.h curl_setup.h \
  /usr/include/x86_64-linux-gnu/asm/byteorder.h \
  /usr/include/linux/byteorder/little_endian.h /usr/include/linux/swab.h \
  /usr/include/x86_64-linux-gnu/asm/swab.h /usr/include/linux/socket.h \
- urldata.h cookie.h llist.h psl.h /usr/include/libpsl.h formdata.h \
- bufref.h curlx/timeval.h curlx/../curl_setup.h curlx/timediff.h \
- http_chunks.h curlx/dynbuf.h hostip.h hash.h curl_addrinfo.h \
- /usr/include/netdb.h /usr/include/rpc/netdb.h \
+ urldata.h cookie.h llist.h psl.h formdata.h bufref.h curlx/timeval.h \
+ curlx/../curl_setup.h curlx/timediff.h http_chunks.h curlx/dynbuf.h \
+ hostip.h hash.h curl_addrinfo.h /usr/include/netdb.h \
+ /usr/include/rpc/netdb.h \
  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
  /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
@@ -330,7 +330,6 @@ urldata.h:
 cookie.h:
 llist.h:
 psl.h:
-/usr/include/libpsl.h:
 formdata.h:
 bufref.h:
 curlx/timeval.h:

@@ -134,13 +134,12 @@ vauth/libcurl_la-cram.lo: vauth/cram.c /usr/include/stdc-predef.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
  ../include/curl/typecheck-gcc.h vauth/vauth.h vauth/../bufref.h \
  vauth/../curlx/dynbuf.h vauth/../urldata.h vauth/../cookie.h \
- vauth/../llist.h vauth/../psl.h /usr/include/libpsl.h \
- vauth/../formdata.h vauth/../bufref.h /usr/include/netinet/in.h \
- /usr/include/x86_64-linux-gnu/bits/in.h vauth/../curlx/timeval.h \
- vauth/../curlx/../curl_setup.h vauth/../curlx/timediff.h \
- vauth/../http_chunks.h vauth/../curlx/dynbuf.h vauth/../hostip.h \
- vauth/../hash.h vauth/../curl_addrinfo.h /usr/include/netdb.h \
- /usr/include/rpc/netdb.h \
+ vauth/../llist.h vauth/../psl.h vauth/../formdata.h vauth/../bufref.h \
+ /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/bits/in.h \
+ vauth/../curlx/timeval.h vauth/../curlx/../curl_setup.h \
+ vauth/../curlx/timediff.h vauth/../http_chunks.h vauth/../curlx/dynbuf.h \
+ vauth/../hostip.h vauth/../hash.h vauth/../curl_addrinfo.h \
+ /usr/include/netdb.h /usr/include/rpc/netdb.h \
  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
  /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
@@ -329,7 +328,6 @@ vauth/../urldata.h:
 vauth/../cookie.h:
 vauth/../llist.h:
 vauth/../psl.h:
-/usr/include/libpsl.h:
 vauth/../formdata.h:
 vauth/../bufref.h:
 /usr/include/netinet/in.h:

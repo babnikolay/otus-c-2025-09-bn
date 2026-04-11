@@ -543,16 +543,16 @@ am__define_uniq_tagged_files = \
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.inc \
 	$(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-ACLOCAL = ${SHELL} '/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' aclocal-1.16
+ACLOCAL = ${SHELL} '/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' aclocal-1.16
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
 APXS = 
 AR = /usr/bin/ar
 AR_FLAGS = cr
 AS = as
-AUTOCONF = ${SHELL} '/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' autoconf
-AUTOHEADER = ${SHELL} '/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' autoheader
-AUTOMAKE = ${SHELL} '/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' automake-1.16
+AUTOCONF = ${SHELL} '/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' autoconf
+AUTOHEADER = ${SHELL} '/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' autoheader
+AUTOMAKE = ${SHELL} '/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' automake-1.16
 AWK = gawk
 BLANK_AT_MAKETIME = 
 CADDY = 
@@ -562,7 +562,7 @@ CCDEPMODE = depmode=gcc3
 # This might hold -Werror
 CFLAGS = -Werror-implicit-function-declaration -O2 -Wno-system-headers 
 CFLAG_CURL_SYMBOL_HIDING = -fvisibility=hidden
-CONFIGURE_OPTIONS = " '--prefix=/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history' '--with-ssl' '--enable-http' '--enable-telnet' '--enable-httpsrr' '--disable-ftp' '--disable-ipfs' '--disable-ldap' '--disable-ldaps' '--disable-rtsp' '--disable-proxy' '--disable-dict' '--disable-tftp' '--disable-pop3' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-mqtt' '--disable-aws' '--disable-ntlm' '--disable-tls-srp' '--disable-unix-sockets' '--disable-file' '--disable-websockets'"
+CONFIGURE_OPTIONS = " '--prefix=/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history' '--with-ssl' '--enable-http' '--enable-telnet' '--enable-httpsrr' '--without-libpsl' '--disable-ftp' '--disable-ipfs' '--disable-ldap' '--disable-ldaps' '--disable-rtsp' '--disable-proxy' '--disable-dict' '--disable-tftp' '--disable-pop3' '--disable-imap' '--disable-smb' '--disable-smtp' '--disable-gopher' '--disable-mqtt' '--disable-aws' '--disable-ntlm' '--disable-tls-srp' '--disable-unix-sockets' '--disable-file' '--disable-websockets'"
 CPP = gcc -E
 CPPFLAGS = -D_GNU_SOURCE
 CSCOPE = cscope
@@ -595,7 +595,7 @@ FILECMD = file
 FISH_FUNCTIONS_DIR = 
 GCOV = 
 GREP = /usr/bin/grep
-HAVE_LIBZ = 
+HAVE_LIBZ = 1
 HTTPD = 
 HTTPD_NGHTTPX = 
 INSTALL = /usr/bin/install -c
@@ -610,9 +610,9 @@ LIBCURL_PC_CFLAGS =
 LIBCURL_PC_CFLAGS_PRIVATE = -DCURL_STATICLIB
 LIBCURL_PC_LDFLAGS_PRIVATE = 
 LIBCURL_PC_LIBS = 
-LIBCURL_PC_LIBS_PRIVATE = -lpsl -lssl -lcrypto
+LIBCURL_PC_LIBS_PRIVATE = -lssl -lcrypto -lssl -lcrypto -lzstd -lbrotlidec -lz
 LIBCURL_PC_REQUIRES = 
-LIBCURL_PC_REQUIRES_PRIVATE = openssl,libpsl
+LIBCURL_PC_REQUIRES_PRIVATE = zlib,libbrotlidec,libbrotlicommon,libzstd,openssl
 LIBOBJS = 
 
 # Prevent LIBS from being used for all link targets
@@ -623,7 +623,7 @@ LN_S = ln -s
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
-MAKEINFO = ${SHELL} '/home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' makeinfo
+MAKEINFO = ${SHELL} '/home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/missing' makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -651,18 +651,18 @@ SHELL = /bin/bash
 SSHD = /usr/sbin/sshd
 SSL_BACKENDS = OpenSSL
 STRIP = strip
-SUPPORT_FEATURES = alt-svc AsynchDNS HSTS HTTPSRR IPv6 Largefile PSL SSL threadsafe
+SUPPORT_FEATURES = alt-svc AsynchDNS brotli HSTS HTTPSRR IPv6 Largefile libz SSL threadsafe zstd
 SUPPORT_PROTOCOLS = HTTP HTTPS TELNET
 TEST_NGHTTPX = nghttpx
 VERSION = -
 VERSIONNUM = 081200
 VSFTPD = 
-ZLIB_LIBS = 
+ZLIB_LIBS = -lz 
 ZSH_FUNCTIONS_DIR = 
-abs_builddir = /home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/src
-abs_srcdir = /home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/src
-abs_top_builddir = /home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0
-abs_top_srcdir = /home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0
+abs_builddir = /home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/src
+abs_srcdir = /home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/src
+abs_top_builddir = /home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0
+abs_top_srcdir = /home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0
 ac_ct_AR = 
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
@@ -691,7 +691,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/install-sh
+install_sh = ${SHELL} /home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history/curl-8.18.0/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libext = a
@@ -701,7 +701,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /home/bn/Work/OTUS/otus-c-2025-09-bn/DZ_8_Unix_history
+prefix = /home/bn/Work/otus-c-2025-09-bn/DZ_8_Unix_history
 program_transform_name = s,x,x,
 psdir = ${docdir}
 runstatedir = ${localstatedir}/run
@@ -909,7 +909,7 @@ curl_SOURCES = $(CURL_CFILES) $(CURL_HFILES) \
 	$(curlx_csrc) $(curlx_hsrc) $(am__append_5)
 #curl_SOURCES = $(am__append_5)
 curl_LDFLAGS = $(CURL_LDFLAGS_BIN) $(UNICODEFLAG)
-curl_LDADD = $(top_builddir)/lib/libcurl.la -lpsl -lssl -lcrypto
+curl_LDADD = $(top_builddir)/lib/libcurl.la -lssl -lcrypto -lssl -lcrypto -lzstd -lbrotlidec -lz
 
 # if unit tests are enabled, build a static library to link them with
 noinst_LTLIBRARIES = libcurltool.la
@@ -3044,23 +3044,23 @@ $(ASCIIPAGE):
 
 # This generates the tool_hugehelp.c file in both uncompressed and
 # compressed formats.
-#$(HUGE): $(ASCIIPAGE) $(MKHELP)
-#	$(HUGECMD)(                                                \
-#	echo '/* !checksrc! disable COPYRIGHT all */' > $(HUGE);   \
-#	echo '/* !checksrc! disable INCLUDEDUP all */' >> $(HUGE); \
-#	echo '/* !checksrc! disable LONGLINE all */' >> $(HUGE);   \
-#	echo '#include "tool_setup.h"' >> $(HUGE);                 \
-#	echo '#ifndef HAVE_LIBZ' >> $(HUGE);                       \
-#	/usr/bin/perl $(MKHELP) < $(ASCIIPAGE) >> $(HUGE);                \
-#	echo '#else' >> $(HUGE);                                   \
-#	/usr/bin/perl $(MKHELP) -c < $(ASCIIPAGE) >> $(HUGE);             \
-#	echo '#endif /* HAVE_LIBZ */' >> $(HUGE) )
-# This generates the tool_hugehelp.c file uncompressed only
 $(HUGE): $(ASCIIPAGE) $(MKHELP)
 	$(HUGECMD)(                                                \
 	echo '/* !checksrc! disable COPYRIGHT all */' > $(HUGE);   \
+	echo '/* !checksrc! disable INCLUDEDUP all */' >> $(HUGE); \
+	echo '/* !checksrc! disable LONGLINE all */' >> $(HUGE);   \
 	echo '#include "tool_setup.h"' >> $(HUGE);                 \
-	/usr/bin/perl $(MKHELP) < $(ASCIIPAGE) >> $(HUGE) )
+	echo '#ifndef HAVE_LIBZ' >> $(HUGE);                       \
+	/usr/bin/perl $(MKHELP) < $(ASCIIPAGE) >> $(HUGE);                \
+	echo '#else' >> $(HUGE);                                   \
+	/usr/bin/perl $(MKHELP) -c < $(ASCIIPAGE) >> $(HUGE);             \
+	echo '#endif /* HAVE_LIBZ */' >> $(HUGE) )
+# This generates the tool_hugehelp.c file uncompressed only
+#$(HUGE): $(ASCIIPAGE) $(MKHELP)
+#	$(HUGECMD)(                                                \
+#	echo '/* !checksrc! disable COPYRIGHT all */' > $(HUGE);   \
+#	echo '#include "tool_setup.h"' >> $(HUGE);                 \
+#	/usr/bin/perl $(MKHELP) < $(ASCIIPAGE) >> $(HUGE) )
 #$(HUGE):
 #	$(HUGECMD)(                                                \
 #	if test ! -f "$(srcdir)/$(HUGE)"; then                     \

@@ -133,7 +133,7 @@ libcurlu_la-content_encoding.lo: content_encoding.c \
  ../include/curl/options.h ../include/curl/header.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
  ../include/curl/typecheck-gcc.h urldata.h cookie.h llist.h psl.h \
- /usr/include/libpsl.h formdata.h bufref.h /usr/include/netinet/in.h \
+ formdata.h bufref.h /usr/include/netinet/in.h \
  /usr/include/x86_64-linux-gnu/bits/in.h curlx/timeval.h \
  curlx/../curl_setup.h curlx/timediff.h http_chunks.h curlx/dynbuf.h \
  hostip.h hash.h curl_addrinfo.h /usr/include/netdb.h \
@@ -145,7 +145,10 @@ libcurlu_la-content_encoding.lo: content_encoding.c \
  ratelimit.h netrc.h mime.h ftp.h pingpong.h http.h smb.h mqtt.h \
  ftplistparser.h multihandle.h conncache.h cshutdn.h multi_ev.h \
  multi_ntfy.h uint-bset.h socketpair.h uint-spbset.h uint-table.h \
- cf-socket.h sockaddr.h sendf.h curl_trc.h content_encoding.h
+ cf-socket.h sockaddr.h /usr/include/zlib.h /usr/include/zconf.h \
+ /usr/include/brotli/decode.h /usr/include/brotli/port.h \
+ /usr/include/brotli/shared_dictionary.h /usr/include/brotli/types.h \
+ /usr/include/zstd.h sendf.h curl_trc.h content_encoding.h
 /usr/include/stdc-predef.h:
 curl_setup.h:
 curl_config.h:
@@ -318,7 +321,6 @@ urldata.h:
 cookie.h:
 llist.h:
 psl.h:
-/usr/include/libpsl.h:
 formdata.h:
 bufref.h:
 /usr/include/netinet/in.h:
@@ -364,6 +366,13 @@ uint-spbset.h:
 uint-table.h:
 cf-socket.h:
 sockaddr.h:
+/usr/include/zlib.h:
+/usr/include/zconf.h:
+/usr/include/brotli/decode.h:
+/usr/include/brotli/port.h:
+/usr/include/brotli/shared_dictionary.h:
+/usr/include/brotli/types.h:
+/usr/include/zstd.h:
 sendf.h:
 curl_trc.h:
 content_encoding.h:

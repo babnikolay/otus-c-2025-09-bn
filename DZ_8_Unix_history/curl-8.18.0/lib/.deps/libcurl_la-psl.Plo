@@ -131,20 +131,7 @@ libcurl_la-psl.lo: psl.c /usr/include/stdc-predef.h curl_setup.h \
  ../include/curl/curl.h ../include/curl/urlapi.h \
  ../include/curl/options.h ../include/curl/header.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
- ../include/curl/typecheck-gcc.h psl.h /usr/include/libpsl.h progress.h \
- curlx/timeval.h curlx/../curl_setup.h curlx/timediff.h curl_share.h \
- cookie.h llist.h urldata.h formdata.h bufref.h /usr/include/netinet/in.h \
- /usr/include/x86_64-linux-gnu/bits/in.h http_chunks.h curlx/dynbuf.h \
- hostip.h hash.h curl_addrinfo.h /usr/include/netdb.h \
- /usr/include/rpc/netdb.h \
- /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
- /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
- /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
- asyn.h httpsrr.h curl_threads.h splay.h dynhds.h request.h bufq.h \
- ratelimit.h netrc.h mime.h ftp.h pingpong.h http.h smb.h mqtt.h \
- ftplistparser.h multihandle.h conncache.h cshutdn.h multi_ev.h \
- multi_ntfy.h uint-bset.h socketpair.h uint-spbset.h uint-table.h \
- cf-socket.h sockaddr.h
+ ../include/curl/typecheck-gcc.h
 /usr/include/stdc-predef.h:
 curl_setup.h:
 curl_config.h:
@@ -313,55 +300,3 @@ curlx/warnless.h:
 ../include/curl/websockets.h:
 ../include/curl/mprintf.h:
 ../include/curl/typecheck-gcc.h:
-psl.h:
-/usr/include/libpsl.h:
-progress.h:
-curlx/timeval.h:
-curlx/../curl_setup.h:
-curlx/timediff.h:
-curl_share.h:
-cookie.h:
-llist.h:
-urldata.h:
-formdata.h:
-bufref.h:
-/usr/include/netinet/in.h:
-/usr/include/x86_64-linux-gnu/bits/in.h:
-http_chunks.h:
-curlx/dynbuf.h:
-hostip.h:
-hash.h:
-curl_addrinfo.h:
-/usr/include/netdb.h:
-/usr/include/rpc/netdb.h:
-/usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
-/usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h:
-/usr/include/x86_64-linux-gnu/bits/netdb.h:
-/usr/include/arpa/inet.h:
-asyn.h:
-httpsrr.h:
-curl_threads.h:
-splay.h:
-dynhds.h:
-request.h:
-bufq.h:
-ratelimit.h:
-netrc.h:
-mime.h:
-ftp.h:
-pingpong.h:
-http.h:
-smb.h:
-mqtt.h:
-ftplistparser.h:
-multihandle.h:
-conncache.h:
-cshutdn.h:
-multi_ev.h:
-multi_ntfy.h:
-uint-bset.h:
-socketpair.h:
-uint-spbset.h:
-uint-table.h:
-cf-socket.h:
-sockaddr.h:

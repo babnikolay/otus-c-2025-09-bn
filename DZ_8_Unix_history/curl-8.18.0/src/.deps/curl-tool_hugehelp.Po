@@ -141,7 +141,8 @@ curl-tool_hugehelp.o: tool_hugehelp.c /usr/include/stdc-predef.h \
  ../lib/curlx/timediff.h ../lib/curlx/wait.h ../lib/curlx/winapi.h \
  ../lib/curlx/inet_pton.h /usr/include/netinet/in.h \
  /usr/include/x86_64-linux-gnu/bits/in.h /usr/include/arpa/inet.h \
- ../lib/curlx/inet_ntop.h tool_hugehelp.h tool_help.h
+ ../lib/curlx/inet_ntop.h tool_hugehelp.h tool_help.h /usr/include/zlib.h \
+ /usr/include/zconf.h
 /usr/include/stdc-predef.h:
 tool_setup.h:
 ../lib/curl_setup.h:
@@ -335,3 +336,5 @@ tool_setup.h:
 ../lib/curlx/inet_ntop.h:
 tool_hugehelp.h:
 tool_help.h:
+/usr/include/zlib.h:
+/usr/include/zconf.h:

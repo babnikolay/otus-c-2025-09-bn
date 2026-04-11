@@ -132,7 +132,7 @@ libcurl_la-version.lo: version.c /usr/include/stdc-predef.h curl_setup.h \
  ../include/curl/options.h ../include/curl/header.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
  ../include/curl/typecheck-gcc.h urldata.h cookie.h llist.h psl.h \
- /usr/include/libpsl.h formdata.h bufref.h /usr/include/netinet/in.h \
+ formdata.h bufref.h /usr/include/netinet/in.h \
  /usr/include/x86_64-linux-gnu/bits/in.h curlx/timeval.h \
  curlx/../curl_setup.h curlx/timediff.h http_chunks.h curlx/dynbuf.h \
  hostip.h hash.h curl_addrinfo.h /usr/include/netdb.h \
@@ -146,7 +146,10 @@ libcurl_la-version.lo: version.c /usr/include/stdc-predef.h curl_setup.h \
  multi_ntfy.h uint-bset.h socketpair.h uint-spbset.h uint-table.h \
  cf-socket.h sockaddr.h vtls/vtls.h vtls/../curl_setup.h http2.h \
  vssh/ssh.h vssh/../curl_setup.h vquic/vquic.h vquic/../curl_setup.h \
- easy_lock.h /usr/lib/gcc/x86_64-linux-gnu/13/include/stdatomic.h
+ easy_lock.h /usr/lib/gcc/x86_64-linux-gnu/13/include/stdatomic.h \
+ /usr/include/zlib.h /usr/include/zconf.h /usr/include/brotli/decode.h \
+ /usr/include/brotli/port.h /usr/include/brotli/shared_dictionary.h \
+ /usr/include/brotli/types.h /usr/include/zstd.h
 /usr/include/stdc-predef.h:
 curl_setup.h:
 curl_config.h:
@@ -319,7 +322,6 @@ urldata.h:
 cookie.h:
 llist.h:
 psl.h:
-/usr/include/libpsl.h:
 formdata.h:
 bufref.h:
 /usr/include/netinet/in.h:
@@ -374,3 +376,10 @@ vquic/vquic.h:
 vquic/../curl_setup.h:
 easy_lock.h:
 /usr/lib/gcc/x86_64-linux-gnu/13/include/stdatomic.h:
+/usr/include/zlib.h:
+/usr/include/zconf.h:
+/usr/include/brotli/decode.h:
+/usr/include/brotli/port.h:
+/usr/include/brotli/shared_dictionary.h:
+/usr/include/brotli/types.h:
+/usr/include/zstd.h:

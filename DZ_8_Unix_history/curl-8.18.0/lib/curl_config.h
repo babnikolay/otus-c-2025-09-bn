@@ -193,10 +193,10 @@
 #define HAVE_BOOL_T 1
 
 /* if BROTLI is in use */
-/* #undef HAVE_BROTLI */
+#define HAVE_BROTLI 1
 
 /* Define to 1 if you have the <brotli/decode.h> header file. */
-/* #undef HAVE_BROTLI_DECODE_H */
+#define HAVE_BROTLI_DECODE_H 1
 
 /* Define to 1 if you have the __builtin_available function. */
 /* #undef HAVE_BUILTIN_AVAILABLE */
@@ -396,7 +396,7 @@
 /* #undef HAVE_LDAP_URL_PARSE */
 
 /* Define to 1 if you have the `brotlidec' library (-lbrotlidec). */
-/* #undef HAVE_LIBBROTLIDEC */
+#define HAVE_LIBBROTLIDEC 1
 
 /* Define to 1 if you have the <libgen.h> header file. */
 #define HAVE_LIBGEN_H 1
@@ -405,7 +405,7 @@
 /* #undef HAVE_LIBIDN2 */
 
 /* Define to 1 if you have the <libpsl.h> header file. */
-#define HAVE_LIBPSL_H 1
+/* #undef HAVE_LIBPSL_H */
 
 /* Define to 1 if you have the <librtmp/rtmp.h> header file. */
 /* #undef HAVE_LIBRTMP_RTMP_H */
@@ -420,10 +420,10 @@
 #define HAVE_LIBSSL 1
 
 /* if zlib is available */
-/* #undef HAVE_LIBZ */
+#define HAVE_LIBZ 1
 
 /* Define to 1 if you have the `zstd' library (-lzstd). */
-/* #undef HAVE_LIBZSTD */
+#define HAVE_LIBZSTD 1
 
 /* Define to 1 if you have the <linux/tcp.h> header file. */
 #define HAVE_LINUX_TCP_H 1
@@ -741,10 +741,10 @@
 #define HAVE_WRITABLE_ARGV 1
 
 /* if libzstd is in use */
-/* #undef HAVE_ZSTD */
+#define HAVE_ZSTD 1
 
 /* Define to 1 if you have the <zstd.h> header file. */
-/* #undef HAVE_ZSTD_H */
+#define HAVE_ZSTD_H 1
 
 /* Define to 1 if you have the `_setmode' function. */
 /* #undef HAVE__SETMODE */
@@ -845,7 +845,7 @@
 #define USE_IPV6 1
 
 /* if libpsl is in use */
-#define USE_LIBPSL 1
+/* #undef USE_LIBPSL */
 
 /* if librtmp is in use */
 /* #undef USE_LIBRTMP */

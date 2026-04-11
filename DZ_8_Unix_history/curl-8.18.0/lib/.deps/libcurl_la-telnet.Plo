@@ -168,11 +168,11 @@ libcurl_la-telnet.lo: telnet.c /usr/include/stdc-predef.h curl_setup.h \
  /usr/include/x86_64-linux-gnu/bits/param.h /usr/include/linux/param.h \
  /usr/include/x86_64-linux-gnu/asm/param.h \
  /usr/include/asm-generic/param.h urldata.h cookie.h llist.h psl.h \
- /usr/include/libpsl.h formdata.h bufref.h curlx/timeval.h \
- curlx/../curl_setup.h curlx/timediff.h http_chunks.h curlx/dynbuf.h \
- hostip.h hash.h curl_addrinfo.h asyn.h httpsrr.h curl_threads.h splay.h \
- dynhds.h request.h bufq.h ratelimit.h netrc.h mime.h ftp.h pingpong.h \
- http.h smb.h mqtt.h ftplistparser.h multihandle.h conncache.h cshutdn.h \
+ formdata.h bufref.h curlx/timeval.h curlx/../curl_setup.h \
+ curlx/timediff.h http_chunks.h curlx/dynbuf.h hostip.h hash.h \
+ curl_addrinfo.h asyn.h httpsrr.h curl_threads.h splay.h dynhds.h \
+ request.h bufq.h ratelimit.h netrc.h mime.h ftp.h pingpong.h http.h \
+ smb.h mqtt.h ftplistparser.h multihandle.h conncache.h cshutdn.h \
  multi_ev.h multi_ntfy.h uint-bset.h socketpair.h uint-spbset.h \
  uint-table.h cf-socket.h sockaddr.h url.h transfer.h sendf.h curl_trc.h \
  telnet.h connect.h progress.h arpa_telnet.h select.h /usr/include/poll.h \
@@ -394,7 +394,6 @@ urldata.h:
 cookie.h:
 llist.h:
 psl.h:
-/usr/include/libpsl.h:
 formdata.h:
 bufref.h:
 curlx/timeval.h:

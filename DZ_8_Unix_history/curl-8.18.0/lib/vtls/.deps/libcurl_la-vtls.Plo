@@ -133,13 +133,12 @@ vtls/libcurl_la-vtls.lo: vtls/vtls.c /usr/include/stdc-predef.h \
  ../include/curl/options.h ../include/curl/header.h \
  ../include/curl/websockets.h ../include/curl/mprintf.h \
  ../include/curl/typecheck-gcc.h vtls/../urldata.h vtls/../cookie.h \
- vtls/../llist.h vtls/../psl.h /usr/include/libpsl.h vtls/../formdata.h \
- vtls/../bufref.h /usr/include/netinet/in.h \
- /usr/include/x86_64-linux-gnu/bits/in.h vtls/../curlx/timeval.h \
- vtls/../curlx/../curl_setup.h vtls/../curlx/timediff.h \
- vtls/../http_chunks.h vtls/../curlx/dynbuf.h vtls/../hostip.h \
- vtls/../hash.h vtls/../curl_addrinfo.h /usr/include/netdb.h \
- /usr/include/rpc/netdb.h \
+ vtls/../llist.h vtls/../psl.h vtls/../formdata.h vtls/../bufref.h \
+ /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/bits/in.h \
+ vtls/../curlx/timeval.h vtls/../curlx/../curl_setup.h \
+ vtls/../curlx/timediff.h vtls/../http_chunks.h vtls/../curlx/dynbuf.h \
+ vtls/../hostip.h vtls/../hash.h vtls/../curl_addrinfo.h \
+ /usr/include/netdb.h /usr/include/rpc/netdb.h \
  /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h \
  /usr/include/x86_64-linux-gnu/bits/types/__sigval_t.h \
  /usr/include/x86_64-linux-gnu/bits/netdb.h /usr/include/arpa/inet.h \
@@ -369,7 +368,6 @@ vtls/../urldata.h:
 vtls/../cookie.h:
 vtls/../llist.h:
 vtls/../psl.h:
-/usr/include/libpsl.h:
 vtls/../formdata.h:
 vtls/../bufref.h:
 /usr/include/netinet/in.h:
