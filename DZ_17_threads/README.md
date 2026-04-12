@@ -82,6 +82,12 @@ gcc -std=c11 -Wall -Wextra -Wpedantic parser_logs.c -o parser_logs -lpthread
 ## Пример вывода  
 ```sh
 $ ./parser_logs logs 2
+Debug: argc = 3
+argv[0] = ./parser_logs
+argv[1] = logs
+argv[2] = 2
+Начало: Sun Apr 12 11:16:58 2026
+
 Total bytes transferred: 279206359988
 
 --- ТОП 10 URL по трафику ---
@@ -107,6 +113,10 @@ Total bytes transferred: 279206359988
        64942 раз         https://baneks.site/best/?p=2
        49456 раз         https://www.google.com.ua/
        46946 раз         https://baneks.site/best/?p=3
+
+Окончание: Sun Apr 12 11:19:43 2026
+
+Программа работала 165 сек.
 ```
 
 ## Технические детали  
