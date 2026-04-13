@@ -45,6 +45,7 @@
 Для сборки необходима библиотека **SDL2**.  
 ```sh
 sudo apt install libsdl2-dev
+sudo apt install libsdl2-ttf-dev
 ```
 
 ## Сборка и запуск  

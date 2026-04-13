@@ -12,7 +12,7 @@ CFLAGS = -Wall -Wextra -Wpedantic -std=c11 $(shell sdl2-config --cflags)
 
 # Библиотеки для линковки
 # `sdl2-config --libs`: автоматически подключает необходимые системные библиотеки SDL2
-LIBS = $(shell sdl2-config --libs)
+LIBS = $(shell sdl2-config --libs) -lSDL2_ttf
 
 # Список объектных файлов
 OBJ = tetris.o
