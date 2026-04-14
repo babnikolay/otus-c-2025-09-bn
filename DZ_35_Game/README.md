@@ -78,3 +78,18 @@ make clean
 * Makefile — Сценарий сборки.  
 * font.ttf — Файл шрифта (пользовательский ассет).  
 * scores.txt — База данных рекордов (генерируется при первом проигрыше).  
+
+## Результат  
+
+```sh
+$ cat scores.txt
+qwe 2000
+bn 100
+asd 2800
+```
+
+![Рисунок 1](Pictures/name.jpg)
+
+![Рисунок 2](Pictures/game.jpg)
+
+![Рисунок 2](Pictures/game1.jpg)
