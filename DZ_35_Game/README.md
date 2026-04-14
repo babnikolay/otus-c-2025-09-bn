@@ -92,4 +92,4 @@ asd 2800
 
 ![Рисунок 2](Pictures/game.jpg)
 
-![Рисунок 2](Pictures/game1.jpg)
+![Рисунок 3](Pictures/game1.jpg)
