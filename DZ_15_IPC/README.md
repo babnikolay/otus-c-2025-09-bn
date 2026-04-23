@@ -99,7 +99,7 @@ FILE_PATH=/tmp/my_log.log
 SOCKET_PATH=/tmp/fsd.sock
 ```
 
-## Ручное управлене  
+## Ручное управление  
 
 ## Запуск в режиме демона  
 ```sh
